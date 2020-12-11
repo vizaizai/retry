@@ -9,27 +9,27 @@ import java.io.Serializable;
  */
 public class CallBackResult implements Serializable {
     /**
-     * 是否成功
+     * 重试状态
      */
-    private final boolean ok;
+    private final RetryStatus status;
     /**
      * 异常消息
      */
     private String errMsg;
 
-    public CallBackResult(boolean ok) {
-        this.ok = ok;
+    public CallBackResult(RetryStatus status) {
+        this.status = status;
     }
 
-    public CallBackResult(boolean ok, String errMsg) {
-        this.ok = ok;
+    public CallBackResult(RetryStatus status, String errMsg) {
+        this.status = status;
         this.errMsg = errMsg;
     }
 
     @Override
     public String toString() {
         return "CallBackResult{" +
-                "ok=" + ok +
+                "status=" + status.name() +
                 ", errMsg='" + errMsg + '\'' +
                 '}';
     }

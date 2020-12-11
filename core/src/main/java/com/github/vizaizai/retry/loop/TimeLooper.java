@@ -5,8 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.time.temporal.ChronoUnit;
 
 /**
  * 时间循环
@@ -21,13 +20,13 @@ public class TimeLooper {
 
 
     public static void wait(LocalDateTime exeTime) {
-        while (true) {
-            if (LocalDateTime.now().isAfter(exeTime)) {
-                return;
-            }
-            sleep1s();
+        // 延时时间，毫秒
+        long delayTime = LocalDateTime.now().until(exeTime, ChronoUnit.MILLIS);
+        // 小于毫秒则忽略
+        if (delayTime < 10) {
+            return;
         }
-
+        sleep(delayTime);
     }
 
     /**
@@ -36,33 +35,20 @@ public class TimeLooper {
      * @param callback 回调
      */
     public static void asyncWait(LocalDateTime exeTime, VCallback callback) {
-        LoopContext.doAsync(exeTime, callback, ()-> {
-            while (true) {
-                List<TimeExecution> timeExecutions = LoopContext.executionList();
-                if (timeExecutions.isEmpty()) {
-                    LoopContext.finish();
-                    log.info("loop wait thread end.");
-                    return;
-                }
-                for (TimeExecution execution : timeExecutions) {
-                    if (LocalDateTime.now().isAfter(execution.getExeTime())) {
-                        LoopContext.done(execution);
-                        break;
-                    }
-                }
-                // 移除已执行执行任务
-                LoopContext.rmDone();
-                sleep1s();
-            }
-
-        });
-
+        // 延时时间，毫秒
+        long delayTime = LocalDateTime.now().until(exeTime, ChronoUnit.MILLIS);
+        // 同步判断一次
+        if (delayTime < 10) {
+            callback.complete();
+            return;
+        }
+        TimeExecution execution = new TimeExecution(exeTime, callback);
+        DelayTaskHelper.doAsyncDelay(delayTime, execution);
     }
 
-
-    private static void sleep1s() {
+    private static void sleep(long millis) {
         try {
-            TimeUnit.SECONDS.sleep(1);
+            Thread.sleep(millis);
         }catch (Exception e) {
             log.error("Thread sleep exception：{}", e.getMessage());
         }

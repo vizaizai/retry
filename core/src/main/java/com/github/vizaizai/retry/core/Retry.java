@@ -1,19 +1,19 @@
 package com.github.vizaizai.retry.core;
 
+import com.github.vizaizai.retry.attempt.AttemptContext;
+import com.github.vizaizai.retry.attempt.Modes;
+import com.github.vizaizai.retry.attempt.strategy.Strategy;
+import com.github.vizaizai.retry.exception.RetryException;
 import com.github.vizaizai.retry.invocation.Callback;
 import com.github.vizaizai.retry.invocation.InvocationOperations;
 import com.github.vizaizai.retry.invocation.Processor;
 import com.github.vizaizai.retry.invocation.VProcessor;
 import com.github.vizaizai.retry.util.Assert;
-import com.github.vizaizai.retry.attempt.AttemptContext;
-import com.github.vizaizai.retry.attempt.Modes;
-import com.github.vizaizai.retry.attempt.strategy.Strategy;
-import com.github.vizaizai.retry.exception.RetryException;
 import org.apache.commons.collections.CollectionUtils;
 
-import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author liaochongwei
@@ -119,21 +119,33 @@ public class Retry<T> {
 
     public static void main(String[] args) {
 
-       Retry.inject(() -> {
-            System.out.println("执行的业务方法片段");
-            double random = Math.random();
-            if (random > 0.1) {
-                throw new RetryException("发生错误啦");
-            }
-            //return "hello" + random;
-        })
-                .mode(Modes.arithmetic(1, 1, ChronoUnit.SECONDS))
-                .max(3)
-                .async(e-> System.out.println("callback: " + e))
-                .retryFor(RetryException.class)
-                .execute();
+        AtomicInteger atomicInteger = new AtomicInteger();
+        for (int i = 0; i < 10000; i++) {
 
-        //System.out.println(ret);
+            Retry.inject(() -> {
+                System.out.println("执行的业务方法片段");
+                double random = Math.random();
+//                try {
+//                    Thread.sleep(100);
+//                }catch (Exception e) {
+//
+//                }
+                if (random > 0.1) {
+                    throw new RetryException("发生错误啦");
+                }
+                //return "hello" + random;
+            })
+                    .mode(Modes.basic(1))
+                    //.mode(Modes.arithmetic(1, 1, ChronoUnit.SECONDS))
+                    //.mode(Modes.geometric(1D, 2D, ChronoUnit.SECONDS))
+                    .max(100)
+                    .async(e-> System.out.println("callback" + atomicInteger.incrementAndGet() + "--------------------"  + e))
+                    .retryFor(RetryException.class)
+                    .execute();
+
+        }
+        //Thread.sleep(1000000);
+
     }
 
 

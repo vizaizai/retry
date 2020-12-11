@@ -2,6 +2,7 @@ package com.github.vizaizai.retry.attempt;
 
 import com.github.vizaizai.retry.attempt.strategy.ArithmeticStrategy;
 import com.github.vizaizai.retry.attempt.strategy.BasicStrategy;
+import com.github.vizaizai.retry.attempt.strategy.GeometricStrategy;
 
 import java.time.temporal.ChronoUnit;
 
@@ -29,14 +30,30 @@ public class Modes {
         arithmeticStrategy.setTimeUnit(unit);
         return arithmeticStrategy;
     }
-    public static ArithmeticStrategy arithmetic() {
-        return arithmetic(0,0,ChronoUnit.SECONDS);
-    }
     public static ArithmeticStrategy arithmetic(Integer d) {
         return arithmetic(0, d, ChronoUnit.SECONDS);
     }
-    public static ArithmeticStrategy arithmetic(Integer d, ChronoUnit unit) {
-        return arithmetic(0, d, unit);
+
+    /**
+     * 等比模式
+     * @param a1 首项
+     * @param q 公比
+     * @param unit 单位
+     * @return GeometricStrategy
+     */
+    public static GeometricStrategy geometric(Double a1, Double q, ChronoUnit unit) {
+        GeometricStrategy geometricStrategy = new GeometricStrategy();
+        geometricStrategy.setA1(a1);
+        geometricStrategy.setQ(q);
+        geometricStrategy.setTimeUnit(unit);
+        return geometricStrategy;
+    }
+    public static GeometricStrategy geometric(Double q) {
+        GeometricStrategy geometricStrategy = new GeometricStrategy();
+        geometricStrategy.setA1(1D);
+        geometricStrategy.setQ(q);
+        geometricStrategy.setTimeUnit(ChronoUnit.SECONDS);
+        return geometricStrategy;
     }
 
     /**

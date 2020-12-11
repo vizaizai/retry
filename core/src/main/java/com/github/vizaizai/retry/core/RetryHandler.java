@@ -60,6 +60,7 @@ public class RetryHandler<T> {
         // 调用正常
         if (!this.invocationOps.haveErr()) {
             this.status = RetryStatus.NO_RETRY;
+            this.callback.complete(new CallBackResult(status));
             return;
         }
         // 发生了异常,并且满足重试条件
@@ -86,7 +87,7 @@ public class RetryHandler<T> {
             log.error("{} retries fail", attemptContext.getAttempts());
             this.status = RetryStatus.TRY_FAIL;
             // 执行异步回调
-            this.callback.complete(new CallBackResult(false, this.invocationOps.getErrMsg()));
+            this.callback.complete(new CallBackResult(this.status, this.invocationOps.getErrMsg()));
             return;
         }
         status = RetryStatus.RETRYING;
@@ -97,7 +98,7 @@ public class RetryHandler<T> {
             // 重试成功
             if (!this.invocationOps.haveErr()) {
                 this.status = RetryStatus.TRY_OK;
-                this.callback.complete(new CallBackResult(true));
+                this.callback.complete(new CallBackResult(this.status));
                 return;
             }
             this.asyncRetry();
