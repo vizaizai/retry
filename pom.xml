@@ -5,10 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.vizaizai</groupId>
-    <artifactId>retry</artifactId>
+    <artifactId>retry-all</artifactId>
     <version>1.0.0</version>
 
-    <packaging>jar</packaging>
     <name>retry</name>
     <url>https://github.com/vizaizai/retry</url>
     <description>Retry tool</description>
