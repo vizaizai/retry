@@ -8,9 +8,12 @@ import com.github.vizaizai.retry.invocation.Callback;
 import com.github.vizaizai.retry.invocation.InvocationOperations;
 import com.github.vizaizai.retry.invocation.Processor;
 import com.github.vizaizai.retry.invocation.VProcessor;
+import com.github.vizaizai.retry.loop.TimeLooper;
 import com.github.vizaizai.retry.util.Assert;
 import org.apache.commons.collections.CollectionUtils;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -20,7 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @date 2020/12/8 11:29
  */
 public class Retry<T> {
-
+    private static final AtomicInteger atomicInteger = new AtomicInteger(0);
     /**
      * 重试环境
      */
@@ -111,25 +114,20 @@ public class Retry<T> {
     private void init() {
         // 重试点为空
         if (CollectionUtils.isEmpty(this.retryHandler.getRetryFor())) {
-            // 默认发生Exception就重试
-            this.retryHandler.setRetryFor(Collections.singletonList(Exception.class));
+            // 默认发生RuntimeException和Error就触发重试
+            this.retryHandler.setRetryFor(Arrays.asList(RuntimeException.class, Error.class));
         }
         this.retryHandler.setAttemptContext(this.attemptContext);
     }
 
     public static void main(String[] args) {
 
-        AtomicInteger atomicInteger = new AtomicInteger();
+
         for (int i = 0; i < 10000; i++) {
 
             Retry.inject(() -> {
-                System.out.println("执行的业务方法片段");
                 double random = Math.random();
-//                try {
-//                    Thread.sleep(100);
-//                }catch (Exception e) {
-//
-//                }
+                TimeLooper.sleep(10);
                 if (random > 0.1) {
                     throw new RetryException("发生错误啦");
                 }
@@ -138,11 +136,20 @@ public class Retry<T> {
                     .mode(Modes.basic(1))
                     //.mode(Modes.arithmetic(1, 1, ChronoUnit.SECONDS))
                     //.mode(Modes.geometric(1D, 2D, ChronoUnit.SECONDS))
-                    .max(100)
-                    .async(e-> System.out.println("callback" + atomicInteger.incrementAndGet() + "--------------------"  + e))
+                    .max(3)
+                    .async(e-> {
+                        atomicInteger.incrementAndGet();
+                        System.out.println("callback--------------------:"  + e);
+                        TimeLooper.sleep(100);
+                    })
                     .retryFor(RetryException.class)
                     .execute();
 
+        }
+
+        while (true) {
+            System.out.println("callback count:" + atomicInteger.get());
+            TimeLooper.sleep(1000);
         }
         //Thread.sleep(1000000);
 

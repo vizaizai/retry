@@ -8,5 +8,5 @@ import java.io.Serializable;
  */
 @FunctionalInterface
 public interface VProcessor extends Serializable {
-    void execute();
+    void execute() throws Throwable;
 }

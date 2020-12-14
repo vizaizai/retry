@@ -9,5 +9,5 @@ import java.io.Serializable;
 @FunctionalInterface
 public interface Processor<T> extends Serializable {
 
-    T execute();
+    T execute() throws Throwable;
 }

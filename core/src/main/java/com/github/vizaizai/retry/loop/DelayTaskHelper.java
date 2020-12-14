@@ -25,8 +25,8 @@ public class DelayTaskHelper {
     static {
         ThreadFactory callbackThreadFactory = new BasicThreadFactory.Builder().namingPattern("loop-callback-thread-%d").build();
         callbackExecutorService =  new ThreadPoolExecutor(0, 50,
-                                                            10L, TimeUnit.SECONDS,
-                                                            new SynchronousQueue<>(),
+                                                            100L, TimeUnit.MILLISECONDS,
+                                                            new LinkedBlockingQueue<>(50),
                                                             callbackThreadFactory);
 
         ThreadFactory delayThreadFactory = new BasicThreadFactory.Builder().namingPattern("loop-thread-%d").build();
@@ -39,19 +39,22 @@ public class DelayTaskHelper {
      * @param execution 执行器
      */
     public static void doAsyncDelay(long millis, TimeExecution execution) {
-        delayExecutorService.schedule(new DelayTask(execution),millis,TimeUnit.MILLISECONDS);
+        delayExecutorService.schedule(new DelayTask(execution), millis, TimeUnit.MILLISECONDS);
     }
 
      static class DelayTask implements Runnable {
         private final TimeExecution timeExecution;
-
         public DelayTask(TimeExecution timeExecution) {
             this.timeExecution = timeExecution;
         }
 
         @Override
         public void run() {
-            callbackExecutorService.submit(()-> this.timeExecution.getCallback().complete());
+            try {
+                callbackExecutorService.execute(()-> this.timeExecution.getCallback().complete());
+            }catch (Exception e) {
+                this.timeExecution.getCallback().complete();
+            }
         }
 
         public TimeExecution getTimeExecution() {

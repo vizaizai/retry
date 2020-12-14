@@ -1,10 +1,10 @@
 package com.github.vizaizai.retry.core;
 
+import com.github.vizaizai.retry.attempt.AttemptContext;
 import com.github.vizaizai.retry.invocation.Callback;
 import com.github.vizaizai.retry.invocation.InvocationOperations;
 import com.github.vizaizai.retry.loop.TimeLooper;
 import com.github.vizaizai.retry.util.Utils;
-import com.github.vizaizai.retry.attempt.AttemptContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
+/**`
  * 重试上下文
  * @author liaochongwei
  * @date 2020/12/8 16:47
@@ -51,7 +51,6 @@ public class RetryHandler<T> {
      * 执行结果
      */
     private T result;
-
     /**
      * 执行目标方法
      */
@@ -60,7 +59,7 @@ public class RetryHandler<T> {
         // 调用正常
         if (!this.invocationOps.haveErr()) {
             this.status = RetryStatus.NO_RETRY;
-            this.callback.complete(new CallBackResult(status));
+            this.doCallback(new CallBackResult(status));
             return;
         }
         // 发生了异常,并且满足重试条件
@@ -87,7 +86,7 @@ public class RetryHandler<T> {
             log.error("{} retries fail", attemptContext.getAttempts());
             this.status = RetryStatus.TRY_FAIL;
             // 执行异步回调
-            this.callback.complete(new CallBackResult(this.status, this.invocationOps.getErrMsg()));
+            this.doCallback(new CallBackResult(this.status, this.invocationOps.getErrMsg()));
             return;
         }
         status = RetryStatus.RETRYING;
@@ -95,10 +94,10 @@ public class RetryHandler<T> {
         log.info("RETRY[{}]- Execution time[{}]", attemptContext.getAttempts(), Utils.format(nextTime, Utils.FORMAT_LONG));
         TimeLooper.asyncWait(nextTime, ()-> {
             this.result = this.invocationOps.execute();
-            // 重试成功
+             //重试成功
             if (!this.invocationOps.haveErr()) {
                 this.status = RetryStatus.TRY_OK;
-                this.callback.complete(new CallBackResult(this.status));
+                this.doCallback(new CallBackResult(this.status));
                 return;
             }
             this.asyncRetry();
@@ -153,11 +152,17 @@ public class RetryHandler<T> {
                 log.debug("Winning retry rule is: {}", winner);
             }
         }
+        return winner != null;
+    }
 
-        if (winner == null) {
-            return (ex instanceof RuntimeException || ex instanceof Error);
+    /**
+     * 执行回调
+     * @param result result
+     */
+    private void doCallback(CallBackResult result) {
+        if (callback != null) {
+            callback.complete(result);
         }
-        return true;
     }
 
     public void setRetryFor(List<Class<? extends Throwable>> retryFor) {
@@ -167,6 +172,8 @@ public class RetryHandler<T> {
             retryRuleAttributes.add(new RetryRuleAttribute(rbRule));
         }
     }
+
+
 
     public InvocationOperations<T> getInvocationOps() {
         return invocationOps;

@@ -1,6 +1,9 @@
 package com.github.vizaizai.retry.invocation;
 
 import com.github.vizaizai.retry.exception.RetryException;
+import com.github.vizaizai.retry.util.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 方法调用处理
@@ -8,6 +11,7 @@ import com.github.vizaizai.retry.exception.RetryException;
  * @date 2020/12/8 14:49
  */
 public class InvocationOperations<T> {
+    private static final Logger log = LoggerFactory.getLogger(InvocationOperations.class);
     /**
      * 带有返回值的处理
      */
@@ -26,6 +30,7 @@ public class InvocationOperations<T> {
     private Throwable cause;
 
     public static <T> InvocationOperations<T> of(Processor<T> processor) {
+        Assert.notNull(processor, "The processor must be not null");
         InvocationOperations<T> operations = new InvocationOperations<>();
         operations.processor = processor;
         operations.isReturn = true;
@@ -33,6 +38,7 @@ public class InvocationOperations<T> {
     }
 
     public static InvocationOperations<Void> of(VProcessor processor) {
+        Assert.notNull(processor, "The processor must be not null");
         InvocationOperations<Void> operations = new InvocationOperations<>();
         operations.vProcessor = processor;
         operations.isReturn = false;
@@ -50,6 +56,9 @@ public class InvocationOperations<T> {
             this.cause = null;
         }catch (RuntimeException | Error ex) {
             this.cause = ex;
+        }catch (Throwable e) {
+            log.error("Checked-exception {}:{}", e.getClass().getName(),e.getMessage());
+            this.cause = e;
         }
         return result;
     }
