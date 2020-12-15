@@ -2,6 +2,7 @@ package com.github.vizaizai.retry.util;
 
 import org.apache.commons.collections.CollectionUtils;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -49,5 +50,16 @@ public class Utils {
 
     public static String[] toStringArray(Collection<String> collection) {
         return (!CollectionUtils.isEmpty(collection) ? collection.toArray(EMPTY_STRING_ARRAY) : EMPTY_STRING_ARRAY);
+    }
+
+    /**
+     * 获取区间随机数[min,max]
+     * @param max max
+     * @param min min
+     * @return Random
+     */
+    public static int getRandom(int max, int min) {
+        Random random = new SecureRandom();
+        return random.nextInt(max - min + 1) + min;
     }
 }

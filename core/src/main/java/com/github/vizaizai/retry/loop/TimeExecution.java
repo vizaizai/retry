@@ -23,9 +23,10 @@ public class TimeExecution {
      */
     private final VCallback callback;
     /**
-     * 是否已执行
+     * 延时时间
      */
-    private boolean isDone = false;
+    private long millis;
+
 
     public TimeExecution(LocalDateTime exeTime, VCallback callback) {
         this.exeTime = exeTime;
@@ -45,11 +46,11 @@ public class TimeExecution {
         return id;
     }
 
-    public boolean isDone() {
-        return isDone;
+    public long getMillis() {
+        return millis;
     }
 
-    public void setDone(boolean done) {
-        isDone = done;
+    public void setMillis(long millis) {
+        this.millis = millis;
     }
 }

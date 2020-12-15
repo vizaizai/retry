@@ -2,6 +2,7 @@ package com.github.vizaizai.retry.attempt;
 
 import com.github.vizaizai.retry.attempt.strategy.ArithmeticStrategy;
 import com.github.vizaizai.retry.attempt.strategy.BasicStrategy;
+import com.github.vizaizai.retry.attempt.strategy.CronStrategy;
 import com.github.vizaizai.retry.attempt.strategy.GeometricStrategy;
 
 import java.time.temporal.ChronoUnit;
@@ -70,5 +71,13 @@ public class Modes {
         return basic(0);
     }
 
+    /**
+     * cron模式(不支持年份)
+     * @param expression 表达式
+     * @return CronStrategy
+     */
+    public static CronStrategy cron(String expression) {
+        return  new CronStrategy(expression);
+    }
 
 }

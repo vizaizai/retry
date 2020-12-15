@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 时间循环
@@ -53,23 +52,4 @@ public class TimeLooper {
             log.error("Thread sleep exception：{}", e.getMessage());
         }
     }
-
-    public static void main(String[] args) {
-
-        AtomicInteger integer = new AtomicInteger(0);
-        for (int i = 0; i < 10000; i++) {
-            asyncWait(LocalDateTime.now().plus(1,ChronoUnit.SECONDS),()->{
-                sleep(100);
-                integer.incrementAndGet();
-                log.info("回调了");
-            });
-        }
-
-        while (true) {
-            log.info("count: {}",integer.get());
-            sleep(1000);
-        }
-
-    }
-
 }
