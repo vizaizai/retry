@@ -38,9 +38,9 @@
     </developers>
 
     <scm>
-        <url>https://github.com/vizaizai/easy-http</url>
-        <connection>https://github.com/vizaizai/easy-http.git</connection>
-        <developerConnection>https://github.com/vizaizai/easy-http</developerConnection>
+        <url>https://github.com/vizaizai/retry</url>
+        <connection>https://github.com/vizaizai/retry.git</connection>
+        <developerConnection>https://github.com/vizaizai/retry</developerConnection>
     </scm>
 
     <properties>

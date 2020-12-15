@@ -74,7 +74,7 @@ public class Retry<T> {
     /**
      * 重试条件
      * @param retryFor 异常
-     * @return
+     * @return Retry
      */
     public Retry<T> retryFor(List<Class<? extends Throwable>> retryFor) {
         Assert.notEmpty(retryFor,"retryFor must be not null");
