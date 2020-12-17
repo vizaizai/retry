@@ -5,6 +5,7 @@ import com.github.vizaizai.retry.core.Retry;
 import com.github.vizaizai.retry.exception.RetryException;
 import com.github.vizaizai.retry.loop.TimeLooper;
 
+import java.time.temporal.ChronoUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -26,11 +27,11 @@ public class Test2 {
                 throw new RetryException("发生错误啦");
             }
         })
-                .mode(Modes.cron("13,37,58 * * * * ?")) // 不支持年份
+                //.mode(Modes.cron("13,37,58 * * * * ?")) // 不支持年份
                 //.mode(Modes.basic(1))
-                //.mode(Modes.arithmetic(1, 1, ChronoUnit.SECONDS))
+                .mode(Modes.arithmetic(1, 0, ChronoUnit.SECONDS))
                 //.mode(Modes.geometric(1D, 2D, ChronoUnit.SECONDS))
-                .max(3)
+                .max(10)
                 .async(e-> {
                     atomicInteger.incrementAndGet();
                     System.out.println("callback--------------------:"  + e);
