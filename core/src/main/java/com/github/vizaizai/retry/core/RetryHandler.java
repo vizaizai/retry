@@ -83,7 +83,7 @@ public class RetryHandler<T> {
     private void asyncRetry() {
         // 调用上限
         if (attemptContext.isMaximum()) {
-            log.error("{} retries fail", attemptContext.getAttempts());
+            log.error("{} retries fail.", attemptContext.getAttempts());
             this.status = RetryStatus.TRY_FAIL;
             // 执行异步回调
             this.doCallback(new CallBackResult(this.status, this.invocationOps.getErrMsg()));
@@ -91,7 +91,7 @@ public class RetryHandler<T> {
         }
         status = RetryStatus.RETRYING;
         LocalDateTime nextTime = attemptContext.getNextTime();
-        log.info("RETRY[{}]- Execution time[{}]", attemptContext.getAttempts(), Utils.format(nextTime, Utils.FORMAT_LONG));
+        log.info("RETRY[{}]-{}", attemptContext.getAttempts(), Utils.format(nextTime, Utils.FORMAT_LONG));
         TimeLooper.asyncWait(nextTime, ()-> {
             this.result = this.invocationOps.execute();
              //重试成功
@@ -110,13 +110,13 @@ public class RetryHandler<T> {
         while (true) {
             // 调用上限
             if (attemptContext.isMaximum()) {
-                log.error("{} retries fail", attemptContext.getAttempts());
+                log.error("{} retries fail.", attemptContext.getAttempts());
                 this.status = RetryStatus.TRY_FAIL;
                 this.invocationOps.throwErr();
             }
             status = RetryStatus.RETRYING;
             LocalDateTime nextTime = attemptContext.getNextTime();
-            log.info("RETRY[{}]- Execution time[{}]",attemptContext.getAttempts(), Utils.format(nextTime, Utils.FORMAT_LONG));
+            log.info("RETRY[{}]-{}",attemptContext.getAttempts(), Utils.format(nextTime, Utils.FORMAT_LONG));
             TimeLooper.wait(nextTime);
             this.result = this.invocationOps.execute();
             // 重试成功
