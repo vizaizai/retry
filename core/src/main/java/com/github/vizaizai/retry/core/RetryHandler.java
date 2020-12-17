@@ -91,7 +91,7 @@ public class RetryHandler<T> {
         }
         status = RetryStatus.RETRYING;
         LocalDateTime nextTime = attemptContext.getNextTime();
-        log.info("RETRY[{}]-{}", attemptContext.getAttempts(), Utils.format(nextTime, Utils.FORMAT_LONG));
+        log.info("RETRY[{}] {}", attemptContext.getAttempts(), Utils.format(nextTime, Utils.FORMAT_LONG));
         TimeLooper.asyncWait(nextTime, ()-> {
             this.result = this.invocationOps.execute();
              //重试成功
@@ -116,7 +116,7 @@ public class RetryHandler<T> {
             }
             status = RetryStatus.RETRYING;
             LocalDateTime nextTime = attemptContext.getNextTime();
-            log.info("RETRY[{}]-{}",attemptContext.getAttempts(), Utils.format(nextTime, Utils.FORMAT_LONG));
+            log.info("RETRY[{}] {}",attemptContext.getAttempts(), Utils.format(nextTime, Utils.FORMAT_LONG));
             TimeLooper.wait(nextTime);
             this.result = this.invocationOps.execute();
             // 重试成功
