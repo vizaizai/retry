@@ -2,6 +2,8 @@ package com.github.vizaizai.retry.loop;
 
 import com.github.vizaizai.retry.util.Utils;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -15,14 +17,15 @@ public class DelayTaskHelper {
 
     private DelayTaskHelper() {
     }
+    private static final Logger log = LoggerFactory.getLogger(DelayTaskHelper.class);
     /**
      * 回调函数线程池
      */
-    private static final ExecutorService callbackExecutorService;
+    private static ExecutorService callbackExecutorService;
     /**
      * 延迟线程池
      */
-    private static final ScheduledExecutorService delayExecutorService;
+    private static ScheduledExecutorService delayExecutorService;
     /**
      * 回调函数数量
      */
@@ -35,15 +38,29 @@ public class DelayTaskHelper {
      * 阻塞队列容量
      */
     private static final Integer BLOCKING_QUEUE_CAPACITY = 50;
-    static {
+    /**
+     * 线程池初始化状态
+     */
+    private static boolean isInitPool = false;
+
+    /**
+     * 初始化线程池
+     */
+    private static synchronized void initPool() {
+        if (isInitPool) {
+            return;
+        }
+        log.info("Initializing[loop-callback-pool]...");
         ThreadFactory callbackThreadFactory = new BasicThreadFactory.Builder().namingPattern("loop-callback-thread-%d").build();
         callbackExecutorService =  new ThreadPoolExecutor(0, MAXIMUM_POOL_SIZE,
-                                                            100L, TimeUnit.MILLISECONDS,
-                                                            new LinkedBlockingQueue<>(BLOCKING_QUEUE_CAPACITY),
-                                                            callbackThreadFactory);
+                100L, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<>(BLOCKING_QUEUE_CAPACITY),
+                callbackThreadFactory);
 
+        log.info("Initializing[loop-pool]...");
         ThreadFactory delayThreadFactory = new BasicThreadFactory.Builder().namingPattern("loop-thread-%d").build();
         delayExecutorService = Executors.newScheduledThreadPool(2, delayThreadFactory);
+        isInitPool = true;
     }
 
     /**
@@ -52,6 +69,9 @@ public class DelayTaskHelper {
      * @param execution 执行器
      */
     public static void doAsyncDelay(long millis, TimeExecution execution) {
+        if (!isInitPool) {
+            initPool();
+        }
         execution.setMillis(millis);
         delayExecutorService.schedule(new DelayTask(execution), millis, TimeUnit.MILLISECONDS);
     }
