@@ -3,7 +3,7 @@ package com.github.vizaizai.retry.invocation;
 import com.github.vizaizai.retry.exception.RetryException;
 import com.github.vizaizai.retry.util.Assert;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.github.vizaizai.logging.LoggerFactory;
 
 /**
  * 方法调用处理

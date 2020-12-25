@@ -3,10 +3,10 @@ package com.github.vizaizai.retry.core;
 import com.github.vizaizai.retry.attempt.AttemptContext;
 import com.github.vizaizai.retry.invocation.Callback;
 import com.github.vizaizai.retry.invocation.InvocationOperations;
+import com.github.vizaizai.logging.LoggerFactory;
 import com.github.vizaizai.retry.loop.TimeLooper;
 import com.github.vizaizai.retry.util.Utils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

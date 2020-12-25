@@ -1,8 +1,8 @@
 package com.github.vizaizai.retry.loop;
 
+import com.github.vizaizai.logging.LoggerFactory;
 import com.github.vizaizai.retry.invocation.VCallback;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
