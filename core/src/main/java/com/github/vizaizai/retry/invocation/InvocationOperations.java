@@ -90,4 +90,12 @@ public class InvocationOperations<T> {
     public String getErrMsg() {
         return cause == null ? "" : cause.getMessage();
     }
+
+    public Processor<T> getProcessor() {
+        return processor;
+    }
+
+    public VProcessor getVProcessor() {
+        return vProcessor;
+    }
 }

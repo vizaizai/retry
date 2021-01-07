@@ -5,6 +5,9 @@ import com.github.vizaizai.retry.invocation.Callback;
 import com.github.vizaizai.retry.invocation.InvocationOperations;
 import com.github.vizaizai.logging.LoggerFactory;
 import com.github.vizaizai.retry.loop.TimeLooper;
+import com.github.vizaizai.retry.store.ObjectFileStore;
+import com.github.vizaizai.retry.store.StoreParameter;
+import com.github.vizaizai.retry.store.StoreService;
 import com.github.vizaizai.retry.util.Utils;
 import org.slf4j.Logger;
 
@@ -19,6 +22,10 @@ import java.util.List;
  */
 public class RetryHandler<T> {
     private static final Logger log = LoggerFactory.getLogger(RetryHandler.class);
+    /**
+     * 默认异步存储
+     */
+    public static final ObjectFileStore DEFAULT_ASYNC_STORE = new ObjectFileStore();
     /**
      * 目标方法操作
      */
@@ -52,6 +59,10 @@ public class RetryHandler<T> {
      */
     private T result;
     /**
+     * 存储服务
+     */
+    private StoreService storeService;
+    /**
      * 执行目标方法
      */
     public void tryInvocation() {
@@ -67,6 +78,7 @@ public class RetryHandler<T> {
             // 异步重试
             if (this.async) {
                 this.asyncRetry();
+                this.saveParameter();
             }else {
                 this.syncRetry();
             }
@@ -163,6 +175,24 @@ public class RetryHandler<T> {
         if (callback != null) {
             callback.complete(result);
         }
+        if (storeService != null) {
+            storeService.delete();
+        }
+    }
+
+
+    private void saveParameter() {
+        StoreParameter storeParameter = new StoreParameter();
+        storeParameter.setProcessor(this.invocationOps.getProcessor());
+        storeParameter.setVProcessor(this.invocationOps.getVProcessor());
+        storeParameter.setCallback(this.callback);
+
+        storeParameter.setMaxAttempts(this.attemptContext.getMaxAttempts());
+        storeParameter.setMode(this.attemptContext.getIntervalStrategyContext().getStrategy());
+        storeParameter.setRetryFor(this.retryFor);
+
+        storeService = new StoreService(storeParameter);
+        storeService.save();
     }
 
     public void setRetryFor(List<Class<? extends Throwable>> retryFor) {

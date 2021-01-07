@@ -20,4 +20,8 @@ public class StrategyContext {
     public LocalDateTime nextExecutionTime(Integer count) {
         return strategy.nextExecutionTime(count);
     }
+
+    public Strategy getStrategy() {
+        return strategy;
+    }
 }
