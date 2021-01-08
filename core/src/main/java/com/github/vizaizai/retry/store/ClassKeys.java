@@ -1,7 +1,6 @@
 package com.github.vizaizai.retry.store;
 
-import com.github.vizaizai.retry.core.Retry;
-import com.github.vizaizai.retry.core.RetryHandler;
+import com.github.vizaizai.retry.core.Reboot;
 
 import java.util.List;
 import java.util.Map;
@@ -22,7 +21,7 @@ public class ClassKeys {
     private static final Map<String, AtomicInteger> COUNT = new ConcurrentHashMap<>();
 
     private static void init() {
-        List<String> fileNames = RetryHandler.DEFAULT_ASYNC_STORE.getFileNames();
+        List<String> fileNames = Reboot.DEFAULT_ASYNC_STORE.getFileNames();
         for (String fileName : fileNames) {
             int i = fileName.lastIndexOf(SOR);
             String seqStr = fileName.substring(i + 1);

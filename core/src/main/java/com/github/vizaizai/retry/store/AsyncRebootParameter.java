@@ -9,11 +9,11 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * 存储参数
+ * 异步重启参数
  * @author liaochongwei
  * @date 2021/1/7 14:36
  */
-public class StoreParameter implements Serializable {
+public class AsyncRebootParameter implements Serializable {
 
     private Processor<?> processor;
 
@@ -25,7 +25,7 @@ public class StoreParameter implements Serializable {
 
     private List<Class<? extends Throwable>> retryFor;
 
-    private Callback callback;
+    private Callback<?> callback;
 
     private String classKey;
 
@@ -69,11 +69,11 @@ public class StoreParameter implements Serializable {
         this.retryFor = retryFor;
     }
 
-    public Callback getCallback() {
+    public Callback<?> getCallback() {
         return callback;
     }
 
-    public void setCallback(Callback callback) {
+    public void setCallback(Callback<?> callback) {
         this.callback = callback;
     }
 

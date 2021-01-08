@@ -1,6 +1,8 @@
 package test.impl;
 
+import com.github.vizaizai.retry.exception.RetryException;
 import com.github.vizaizai.retry.invocation.Processor;
+import com.github.vizaizai.retry.loop.TimeLooper;
 
 /**
  * @author liaochongwei
@@ -9,7 +11,11 @@ import com.github.vizaizai.retry.invocation.Processor;
 public class MyProcessor implements Processor<String> {
     @Override
     public String execute() throws Throwable {
-        System.out.println("啦啦啦");
-        return "hah";
+        double random = Math.random();
+        TimeLooper.sleep(1);
+        if (random > 0.1) {
+            throw new RetryException("业务代码异常~");
+        }
+        return "random:" + random;
     }
 }

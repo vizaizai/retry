@@ -1,6 +1,6 @@
 package com.github.vizaizai.retry.loop;
 
-import com.github.vizaizai.retry.invocation.VCallback;
+import com.github.vizaizai.retry.invocation.WaitCallback;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -21,14 +21,14 @@ public class TimeExecution {
     /**
      * 到达通知
      */
-    private final VCallback callback;
+    private final WaitCallback callback;
     /**
      * 延时时间
      */
     private long millis;
 
 
-    public TimeExecution(LocalDateTime exeTime, VCallback callback) {
+    public TimeExecution(LocalDateTime exeTime, WaitCallback callback) {
         this.exeTime = exeTime;
         this.callback = callback;
         this.id = UUID.randomUUID().toString();
@@ -38,7 +38,7 @@ public class TimeExecution {
         return exeTime;
     }
 
-    public VCallback getCallback() {
+    public WaitCallback getCallback() {
         return callback;
     }
 

@@ -6,14 +6,9 @@ import com.github.vizaizai.retry.invocation.Callback;
 import com.github.vizaizai.retry.invocation.InvocationOperations;
 import com.github.vizaizai.retry.invocation.Processor;
 import com.github.vizaizai.retry.invocation.VProcessor;
-import com.github.vizaizai.retry.loop.TimeLooper;
-import com.github.vizaizai.retry.store.ObjectFileStore;
-import com.github.vizaizai.retry.store.StoreParameter;
 import com.github.vizaizai.retry.util.Assert;
 import org.apache.commons.collections.CollectionUtils;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -97,7 +92,7 @@ public class Retry<T> {
      * @param callback 回调函数
      * @return Retry
      */
-    public Retry<T> async(Callback callback) {
+    public Retry<T> async(Callback<T> callback) {
         Assert.notNull(callback,"callback must be not null");
         this.retryHandler.setCallback(callback);
         this.retryHandler.setAsync(true);
