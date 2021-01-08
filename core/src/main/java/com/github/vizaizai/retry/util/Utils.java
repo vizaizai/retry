@@ -66,7 +66,7 @@ public class Utils {
     /**
      * 判断该对象class是否为普通类(匿名、lambda)
      * @param object
-     * @return
+     * @return boolean
      */
     public static boolean isOrdinaryClass(Object object) {
         Class<?> cls = object.getClass();
