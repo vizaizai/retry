@@ -76,7 +76,6 @@ public class Utils {
         }
         String className = cls.getSimpleName();
         // lambda表达式类
-        return !className.contains("$$Lambda$1/");
+        return !className.matches(".+\\$\\$Lambda\\$.*/\\d*"); // Test1$$Lambda$1/472654579
     }
-
 }
