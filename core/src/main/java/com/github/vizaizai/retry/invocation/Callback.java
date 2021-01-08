@@ -5,7 +5,7 @@ import com.github.vizaizai.retry.core.CallBackResult;
 import java.io.Serializable;
 
 /**
- * 重试回调函数
+ * 重试回调函数，T为返回值类型
  * @author liaochongwei
  * @date 2020/12/8 15:34
  */

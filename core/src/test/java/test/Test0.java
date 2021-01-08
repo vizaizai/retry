@@ -19,32 +19,40 @@ public class Test0 {
     public static void main(String[] args) {
 
         // 默认重试三次，没有间隔时间，同步，retryFor：RuntimeException或者Error
-//        Retry<Void> retry1 = Retry.inject(() -> {
-//            System.out.println("执行业务方法");
-//            if (true) {
-//                throw new RuntimeException("业务出错");
-//            }
-//        });
-//        retry1.execute();
+        Retry<Void> retry1 = Retry.inject(() -> {
+            System.out.println("执行业务方法");
+            if (Utils.getRandom(5,1) > 3) {
+                throw new RuntimeException("业务出错");
+            }
+        });
+        retry1.execute();
 
 
         // 带有返回值
-//        Retry<String> retry2 = Retry.inject(() -> {
-//            System.out.println("执行业务方法");
-//            if (Utils.getRandom(5,1) > 3) {
-//                throw new RuntimeException("业务出错");
-//            }
-//            return "hello";
-//        });
-//        System.out.println(retry2.execute());
+        Retry<String> retry2 = Retry.inject(() -> {
+            System.out.println("执行业务方法");
+            if (Utils.getRandom(5,1) > 3) {
+                throw new RuntimeException("业务出错");
+            }
+            return "hello";
+        });
+        System.out.println(retry2.execute());
 
         // 异步
-        Retry.inject(new Processor<Object>() {
-            @Override
-            public Object execute() throws Throwable {
-                return null;
+        Retry<String> asyncRetry = Retry.inject(() -> {
+            System.out.println("执行业务方法");
+            if (Utils.getRandom(5,1) > 3) {
+                throw new RuntimeException("业务出错");
             }
+            return "hello";
         });
+        asyncRetry.async(result -> {
+            System.out.println("异步重试回调");
+        });
+        asyncRetry.execute();
+
+
+
         Retry<String> retry3 = Retry.inject(() -> {
             System.out.println("执行业务方法");
             TimeLooper.sleep(20);
