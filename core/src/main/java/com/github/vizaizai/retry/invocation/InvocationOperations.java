@@ -1,9 +1,9 @@
 package com.github.vizaizai.retry.invocation;
 
+import com.github.vizaizai.logging.LoggerFactory;
 import com.github.vizaizai.retry.exception.RetryException;
 import com.github.vizaizai.retry.util.Assert;
 import org.slf4j.Logger;
-import com.github.vizaizai.logging.LoggerFactory;
 
 /**
  * 方法调用处理
@@ -87,7 +87,12 @@ public class InvocationOperations<T> {
     public Throwable getCause() {
         return cause;
     }
-    public String getErrMsg() {
-        return cause == null ? "" : cause.getMessage();
+
+    public Processor<T> getProcessor() {
+        return processor;
+    }
+
+    public VProcessor getVProcessor() {
+        return vProcessor;
     }
 }

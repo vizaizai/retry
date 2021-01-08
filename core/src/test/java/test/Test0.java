@@ -2,6 +2,7 @@ package test;
 
 import com.github.vizaizai.retry.attempt.Modes;
 import com.github.vizaizai.retry.core.Retry;
+import com.github.vizaizai.retry.invocation.Processor;
 import com.github.vizaizai.retry.loop.TimeLooper;
 import com.github.vizaizai.retry.util.Utils;
 
@@ -38,6 +39,12 @@ public class Test0 {
 //        System.out.println(retry2.execute());
 
         // 异步
+        Retry.inject(new Processor<Object>() {
+            @Override
+            public Object execute() throws Throwable {
+                return null;
+            }
+        });
         Retry<String> retry3 = Retry.inject(() -> {
             System.out.println("执行业务方法");
             TimeLooper.sleep(20);

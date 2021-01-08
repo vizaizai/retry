@@ -62,4 +62,21 @@ public class Utils {
         Random random = new SecureRandom();
         return random.nextInt(max - min + 1) + min;
     }
+
+    /**
+     * 判断该对象class是否为普通类(匿名、lambda)
+     * @param object
+     * @return
+     */
+    public static boolean isOrdinaryClass(Object object) {
+        Class<?> cls = object.getClass();
+        // 判断匿名内部类
+        if (cls.isAnonymousClass()) {
+            return false;
+        }
+        String className = cls.getSimpleName();
+        // lambda表达式类
+        return !className.contains("$$Lambda$1/");
+    }
+
 }

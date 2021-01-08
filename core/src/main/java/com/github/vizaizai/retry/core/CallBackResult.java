@@ -7,42 +7,55 @@ import java.io.Serializable;
  * @author liaochongwei
  * @date 2020/12/10 17:52
  */
-public class CallBackResult implements Serializable {
+public class CallBackResult<T> implements Serializable {
     /**
      * 重试状态
      */
-    private final RetryStatus status;
+    private RetryStatus status;
     /**
-     * 异常消息
+     * 返回结果
      */
-    private String errMsg;
+    private T value;
+    /**
+     * 异常
+     */
+    private Throwable cause;
 
-    public CallBackResult(RetryStatus status) {
-        this.status = status;
+
+    public static <T> CallBackResult<T> ok(RetryStatus status, T value) {
+        CallBackResult<T> result = new CallBackResult<>();
+        result.status = status;
+        result.value = value;
+        return result;
     }
-
-    public CallBackResult(RetryStatus status, String errMsg) {
-        this.status = status;
-        this.errMsg = errMsg;
-    }
-
-    @Override
-    public String toString() {
-        return "CallBackResult{" +
-                "status=" + status.name() +
-                ", errMsg='" + errMsg + '\'' +
-                '}';
+    public static <T> CallBackResult<T> fail(RetryStatus status, Throwable cause) {
+        CallBackResult<T> result = new CallBackResult<>();
+        result.status = status;
+        result.cause = cause;
+        return result;
     }
 
     public RetryStatus getStatus() {
         return status;
     }
 
-    public String getErrMsg() {
-        return errMsg;
+    public void setStatus(RetryStatus status) {
+        this.status = status;
     }
 
-    public void setErrMsg(String errMsg) {
-        this.errMsg = errMsg;
+    public T getValue() {
+        return value;
+    }
+
+    public void setValue(T value) {
+        this.value = value;
+    }
+
+    public Throwable getCause() {
+        return cause;
+    }
+
+    public void setCause(Throwable cause) {
+        this.cause = cause;
     }
 }

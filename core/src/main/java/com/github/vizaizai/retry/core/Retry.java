@@ -28,11 +28,11 @@ public class Retry<T> {
      */
     private final AttemptContext attemptContext;
 
+
     private Retry() {
         retryHandler = new RetryHandler<>();
         this.attemptContext = new AttemptContext(3);
     }
-
     /**
      * 注入可能需要重试的方法
      * @param processor 方法
@@ -92,7 +92,7 @@ public class Retry<T> {
      * @param callback 回调函数
      * @return Retry
      */
-    public Retry<T> async(Callback callback) {
+    public Retry<T> async(Callback<T> callback) {
         Assert.notNull(callback,"callback must be not null");
         this.retryHandler.setCallback(callback);
         this.retryHandler.setAsync(true);
@@ -114,6 +114,8 @@ public class Retry<T> {
         }
         this.retryHandler.setAttemptContext(this.attemptContext);
     }
+
+
 }
 
 

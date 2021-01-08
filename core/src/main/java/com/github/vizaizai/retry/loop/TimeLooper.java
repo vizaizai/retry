@@ -1,7 +1,7 @@
 package com.github.vizaizai.retry.loop;
 
 import com.github.vizaizai.logging.LoggerFactory;
-import com.github.vizaizai.retry.invocation.VCallback;
+import com.github.vizaizai.retry.invocation.WaitCallback;
 import org.slf4j.Logger;
 
 import java.time.LocalDateTime;
@@ -33,7 +33,7 @@ public class TimeLooper {
      * @param exeTime 执行时间
      * @param callback 回调
      */
-    public static void asyncWait(LocalDateTime exeTime, VCallback callback) {
+    public static void asyncWait(LocalDateTime exeTime, WaitCallback callback) {
         // 延时时间，毫秒
         long delayTime = LocalDateTime.now().until(exeTime, ChronoUnit.MILLIS);
         // 同步判断一次
