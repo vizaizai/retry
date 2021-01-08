@@ -66,7 +66,7 @@ public class Utils {
     /**
      * 判断该对象class是否为普通类(匿名、lambda)
      * @param object
-     * @return
+     * @return boolean
      */
     public static boolean isOrdinaryClass(Object object) {
         Class<?> cls = object.getClass();
@@ -76,7 +76,6 @@ public class Utils {
         }
         String className = cls.getSimpleName();
         // lambda表达式类
-        return !className.contains("$$Lambda$1/");
+        return !className.matches(".+\\$\\$Lambda\\$.*/\\d*"); // Test1$$Lambda$1/472654579
     }
-
 }
