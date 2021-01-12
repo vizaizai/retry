@@ -2,10 +2,9 @@ package com.github.vizaizai.retry.store;
 
 import com.github.vizaizai.retry.core.Reboot;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author liaochongwei
@@ -18,7 +17,7 @@ public class ClassKeys {
 
     private static final String SOR = "#";
     private static boolean init = false;
-    private static final Map<String, AtomicInteger> COUNT = new ConcurrentHashMap<>();
+    private static final Map<String, Integer> COUNT = new HashMap<>();
 
     private static void init() {
         List<String> fileNames = Reboot.DEFAULT_ASYNC_STORE.getFileNames();
@@ -27,9 +26,9 @@ public class ClassKeys {
             String seqStr = fileName.substring(i + 1);
             try {
                 String key = fileName.substring(0, i);
-                AtomicInteger value = new AtomicInteger(Integer.parseInt(seqStr));
-                AtomicInteger mValue = COUNT.get(key);
-                if (mValue == null || mValue.get() < value.get()) {
+                Integer value = Integer.parseInt(seqStr);
+                Integer mValue = COUNT.get(key);
+                if (mValue == null || mValue < value) {
                     COUNT.put(key, value);
                 }
             }catch (Exception ignored) {}
@@ -44,12 +43,13 @@ public class ClassKeys {
                 init();
             }
             if (!COUNT.containsKey(name)) {
-                AtomicInteger value = new AtomicInteger(0);
+                int value = 0;
                 COUNT.put(name, value);
-                return  name + SOR + value.get();
+                return  name + SOR + value;
             }
-            AtomicInteger value = COUNT.get(name);
-            return name + SOR + value.incrementAndGet();
+            Integer value = COUNT.get(name);
+            COUNT.put(name, ++value);
+            return name + SOR + value;
         }
     }
 }
