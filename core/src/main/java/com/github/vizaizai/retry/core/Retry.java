@@ -51,6 +51,17 @@ public class Retry<T> {
         retry.retryHandler.setInvocationOps(InvocationOperations.of(processor));
         return retry;
     }
+
+    /**
+     * 重试预处理
+     * @param preHandler
+     * @return Retry
+     */
+    public Retry<T> preHandler(VProcessor preHandler) {
+        Assert.notNull(preHandler, "preHandler must be not null");
+        this.retryHandler.getInvocationOps().setPreRetryProcessor(preHandler);
+        return this;
+    }
     /**
      * 设置最大重试次数
      * @param maxAttempts 最大重试次数
@@ -104,7 +115,6 @@ public class Retry<T> {
         this.retryHandler.tryInvocation();
         return this.retryHandler.getResult();
     }
-
 
     private void init() {
         // 重试点为空
