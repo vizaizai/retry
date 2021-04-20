@@ -13,7 +13,7 @@
 <dependency>
     <groupId>com.github.vizaizai</groupId>
     <artifactId>retry</artifactId>
-    <version>1.1.1</version>
+    <version>1.1.3</version>
 </dependency>
 ```
 

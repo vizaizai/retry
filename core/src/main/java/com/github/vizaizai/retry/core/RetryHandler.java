@@ -57,6 +57,7 @@ public class RetryHandler<T> {
      * 存储服务
      */
     private StoreService storeService;
+
     /**
      * 执行目标方法
      */
@@ -100,7 +101,7 @@ public class RetryHandler<T> {
         LocalDateTime nextTime = attemptContext.getNextTime();
         log.info("RETRY[{}] {}", attemptContext.getAttempts(), Utils.format(nextTime, Utils.FORMAT_LONG));
         TimeLooper.asyncWait(nextTime, ()-> {
-            this.result = this.invocationOps.execute();
+            this.result = this.invocationOps.executeForRetry();
              //重试成功
             if (!this.invocationOps.haveErr()) {
                 this.status = RetryStatus.TRY_OK;
@@ -125,7 +126,7 @@ public class RetryHandler<T> {
             LocalDateTime nextTime = attemptContext.getNextTime();
             log.info("RETRY[{}] {}",attemptContext.getAttempts(), Utils.format(nextTime, Utils.FORMAT_LONG));
             TimeLooper.wait(nextTime);
-            this.result = this.invocationOps.execute();
+            this.result = this.invocationOps.executeForRetry();
             // 重试成功
             if (!this.invocationOps.haveErr()) {
                 this.status = RetryStatus.TRY_OK;
@@ -256,4 +257,6 @@ public class RetryHandler<T> {
     public void setResult(T result) {
         this.result = result;
     }
+
+
 }

@@ -3,6 +3,7 @@ package com.github.vizaizai.retry.invocation;
 import com.github.vizaizai.logging.LoggerFactory;
 import com.github.vizaizai.retry.exception.RetryException;
 import com.github.vizaizai.retry.util.Assert;
+import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 
 /**
@@ -28,6 +29,10 @@ public class InvocationOperations<T> {
      * 发生的异常
      */
     private Throwable cause;
+    /**
+     * 重试前处理
+     */
+    private VProcessor preRetryProcessor;
 
     public static <T> InvocationOperations<T> of(Processor<T> processor) {
         Assert.notNull(processor, "The processor must be not null");
@@ -45,9 +50,14 @@ public class InvocationOperations<T> {
         return operations;
     }
 
+    public T executeForRetry(){
+        this.preHandle();
+        return this.execute();
+    }
     public T execute(){
         T result = null;
         try {
+
             if (this.isReturn) {
                 result =  this.processor.execute();
             }else {
@@ -79,7 +89,18 @@ public class InvocationOperations<T> {
         if (this.cause instanceof Exception) {
             throw new RetryException(cause);
         }
+    }
 
+    private void preHandle() {
+        // 重试预处理
+        try {
+            // 存在预处理，且发生触发过重试
+            if(this.preRetryProcessor != null && this.cause != null) {
+                this.preRetryProcessor.execute();
+            }
+        }catch (Throwable throwable) {
+            log.error("Retry pre-handle error: {}", throwable.getMessage());
+        }
     }
     public boolean haveErr() {
         return cause != null;
@@ -94,5 +115,8 @@ public class InvocationOperations<T> {
 
     public VProcessor getVProcessor() {
         return vProcessor;
+    }
+    public void setPreRetryProcessor(VProcessor preRetryProcessor) {
+        this.preRetryProcessor = preRetryProcessor;
     }
 }
