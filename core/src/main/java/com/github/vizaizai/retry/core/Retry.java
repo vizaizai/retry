@@ -54,11 +54,11 @@ public class Retry<T> {
 
     /**
      * 重试预处理
-     * @param preHandler
+     * @param preHandler 预处理逻辑
      * @return Retry
      */
     public Retry<T> preHandler(VProcessor preHandler) {
-        Assert.notNull(preHandler, "preHandler must be not null");
+        Assert.notNull(preHandler, "pre-handler must be not null");
         this.retryHandler.getInvocationOps().setPreRetryProcessor(preHandler);
         return this;
     }
