@@ -13,7 +13,7 @@ public class StoreService {
     private final ObjectStore objectStore;
     public StoreService(AsyncRebootParameter asyncRebootParameter) {
         this.asyncRebootParameter = asyncRebootParameter;
-        this.objectStore = Reboot.DEFAULT_ASYNC_STORE;
+        this.objectStore = Reboot.getInstance().getObjectStore();
     }
     /**
      * 保存异步参数

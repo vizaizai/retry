@@ -20,7 +20,7 @@ public class Test2 {
      */
     public static void main(String[] args) {
 
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 3; i++) {
             Retry.inject(new MyProcessor())
                     .mode(Modes.cron("13,37,58 * * * * ?")) // 不支持年份
                     //.mode(Modes.basic(1))

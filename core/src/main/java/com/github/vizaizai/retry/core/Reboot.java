@@ -4,6 +4,7 @@ import com.github.vizaizai.logging.LoggerFactory;
 import com.github.vizaizai.retry.loop.TimeLooper;
 import com.github.vizaizai.retry.store.AsyncRebootParameter;
 import com.github.vizaizai.retry.store.ObjectFileStore;
+import com.github.vizaizai.retry.store.ObjectStore;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -18,21 +19,37 @@ public class Reboot {
      * 默认异步存储
      */
     public static final ObjectFileStore DEFAULT_ASYNC_STORE = new ObjectFileStore();
+    /**
+     * 对象存储
+     */
+    private ObjectStore objectStore;
+    /**
+     * Reboot实例
+     */
+    private static final Reboot reboot = new Reboot();
     private Reboot() {
     }
-    public static void init() {
-        Reboot reboot = new Reboot();
+
+    public static Reboot getInstance() {
+        return reboot;
+    }
+
+    public void configStore(ObjectStore objectStore) {
+        reboot.objectStore = objectStore;
+    }
+
+    public void start() {
         TimeLooper.sleep(500);
-        List<Object> objects = DEFAULT_ASYNC_STORE.load();
+        List<Object> objects = getObjectStore().load();
         for (Object object : objects) {
             if (object instanceof AsyncRebootParameter) {
-                reboot.doRetry((AsyncRebootParameter) object);
+                this.doRetry((AsyncRebootParameter) object);
             }
         }
     }
 
     @SuppressWarnings({"unchecked","rawtypes"})
-    public void doRetry(AsyncRebootParameter parameter) {
+    private void doRetry(AsyncRebootParameter parameter) {
         try {
             Retry retry;
             if (parameter.getProcessor() != null) {
@@ -53,5 +70,7 @@ public class Reboot {
         }
     }
 
-
+    public ObjectStore getObjectStore() {
+        return objectStore == null ? DEFAULT_ASYNC_STORE : objectStore;
+    }
 }

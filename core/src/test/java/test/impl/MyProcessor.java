@@ -13,7 +13,8 @@ public class MyProcessor implements Processor<String> {
     public String execute() throws Throwable {
         double random = Math.random();
         TimeLooper.sleep(1);
-        if (random > 0.1) {
+        System.out.println(random+"----------");
+        if (random > 0.4) {
             throw new RetryException("业务代码异常~");
         }
         return "random:" + random;
