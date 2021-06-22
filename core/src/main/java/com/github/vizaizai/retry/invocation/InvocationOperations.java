@@ -3,7 +3,6 @@ package com.github.vizaizai.retry.invocation;
 import com.github.vizaizai.logging.LoggerFactory;
 import com.github.vizaizai.retry.exception.RetryException;
 import com.github.vizaizai.retry.util.Assert;
-import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 
 /**

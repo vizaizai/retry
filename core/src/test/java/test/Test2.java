@@ -20,11 +20,11 @@ public class Test2 {
      */
     public static void main(String[] args) {
 
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 1; i++) {
             Retry.inject(new MyProcessor())
-                    //.mode(Modes.cron("13,37,58 * * * * ?")) // 不支持年份
+                    .mode(Modes.cron("13,37,58 * * * * ?")) // 不支持年份
                     //.mode(Modes.basic(1))
-                    .mode(Modes.arithmetic(1, 0, ChronoUnit.SECONDS))
+                    //.mode(Modes.arithmetic(1, 0, ChronoUnit.SECONDS))
                     //.mode(Modes.geometric(1D, 2D, ChronoUnit.SECONDS))
                     .max(10)
                     .async(new MyCallback())

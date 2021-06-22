@@ -1,7 +1,5 @@
 package com.github.vizaizai.retry.util;
 
-import org.apache.commons.collections.CollectionUtils;
-
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -49,7 +47,7 @@ public class Utils {
     }
 
     public static String[] toStringArray(Collection<String> collection) {
-        return (!CollectionUtils.isEmpty(collection) ? collection.toArray(EMPTY_STRING_ARRAY) : EMPTY_STRING_ARRAY);
+        return (!CollUtils.isEmpty(collection) ? collection.toArray(EMPTY_STRING_ARRAY) : EMPTY_STRING_ARRAY);
     }
 
     /**

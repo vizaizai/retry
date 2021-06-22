@@ -3,13 +3,14 @@ package com.github.vizaizai.retry.attempt;
 import com.github.vizaizai.retry.util.Utils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
  * @author liaochongwei
  * @date 2020/12/11 11:08
  */
-public class CronSequenceGenerator {
+public class CronSequenceGenerator implements Serializable {
     private final String expression;
 
     private final TimeZone timeZone;

@@ -7,7 +7,7 @@ import com.github.vizaizai.retry.invocation.InvocationOperations;
 import com.github.vizaizai.retry.invocation.Processor;
 import com.github.vizaizai.retry.invocation.VProcessor;
 import com.github.vizaizai.retry.util.Assert;
-import org.apache.commons.collections.CollectionUtils;
+import com.github.vizaizai.retry.util.CollUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -118,7 +118,7 @@ public class Retry<T> {
 
     private void init() {
         // 重试点为空
-        if (CollectionUtils.isEmpty(this.retryHandler.getRetryFor())) {
+        if (CollUtils.isEmpty(this.retryHandler.getRetryFor())) {
             // 默认发生RuntimeException和Error就触发重试
             this.retryHandler.setRetryFor(Arrays.asList(RuntimeException.class, Error.class));
         }

@@ -37,7 +37,7 @@ public class ObjectFileStore implements ObjectStore {
             String fileName = fileDir.getPath() + File.separator + key;
             try (FileOutputStream fos = new FileOutputStream(fileName);
                  ObjectOutputStream oos = new ObjectOutputStream(fos)){
-                oos.writeObject(source);
+                 oos.writeObject(source);
             }
         }catch (Exception e) {
             log.error("Failed to save object");
