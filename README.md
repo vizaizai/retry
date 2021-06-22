@@ -87,7 +87,7 @@ retry1.(RetryException.class)
 // 设置对象序列化文件路径，默认值为/data/retry
 Reboot.DEFAULT_ASYNC_STORE.setStorePath("/data/retry");
 // 服务重启时执行
-Reboot.init();
+Reboot.getInstance().start();
 ```
 
 
