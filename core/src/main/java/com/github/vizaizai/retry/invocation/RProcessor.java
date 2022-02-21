@@ -8,7 +8,7 @@ import java.io.Serializable;
  * @date 2020/12/8 14:32
  */
 @FunctionalInterface
-public interface Processor<T> extends Serializable {
+public interface RProcessor<T> extends Serializable {
 
     T execute() throws Throwable;
 }

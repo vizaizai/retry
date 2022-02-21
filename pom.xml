@@ -6,7 +6,11 @@
 
     <groupId>com.github.vizaizai</groupId>
     <artifactId>retry-all</artifactId>
+    <packaging>pom</packaging>
     <version>1.0.0</version>
+    <modules>
+        <module>core</module>
+    </modules>
 
     <name>retry</name>
     <url>https://github.com/vizaizai/retry</url>

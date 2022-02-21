@@ -1,6 +1,6 @@
 package com.github.vizaizai.retry.invocation;
 
-import com.github.vizaizai.retry.core.CallBackResult;
+import com.github.vizaizai.retry.core.RetryResult;
 
 import java.io.Serializable;
 
@@ -12,5 +12,5 @@ import java.io.Serializable;
 @FunctionalInterface
 public interface Callback<T> extends Serializable {
 
-    void complete(CallBackResult<T> result);
+    void complete(RetryResult<T> result);
 }

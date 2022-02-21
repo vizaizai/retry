@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author liaochongwei
  * @date 2020/12/9 10:04
  */
+@Deprecated
 public class DelayTaskHelper {
 
     private DelayTaskHelper() {
@@ -33,11 +34,11 @@ public class DelayTaskHelper {
     /**
      * 线程池最大长度
      */
-    private static final Integer MAXIMUM_POOL_SIZE = 50;
+    private static final Integer MAXIMUM_POOL_SIZE = 32;
     /**
      * 阻塞队列容量
      */
-    private static final Integer BLOCKING_QUEUE_CAPACITY = 50;
+    private static final Integer BLOCKING_QUEUE_CAPACITY = 500;
     /**
      * 线程池初始化状态
      */

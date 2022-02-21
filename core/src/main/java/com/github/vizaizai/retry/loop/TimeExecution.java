@@ -9,6 +9,7 @@ import java.util.UUID;
  * @author liaochongwei
  * @date 2020/12/9 10:28
  */
+@Deprecated
 public class TimeExecution {
     /**
      * 标识

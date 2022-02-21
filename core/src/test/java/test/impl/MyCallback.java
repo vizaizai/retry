@@ -1,6 +1,6 @@
 package test.impl;
 
-import com.github.vizaizai.retry.core.CallBackResult;
+import com.github.vizaizai.retry.core.RetryResult;
 import com.github.vizaizai.retry.invocation.Callback;
 
 /**
@@ -9,7 +9,7 @@ import com.github.vizaizai.retry.invocation.Callback;
  */
 public class MyCallback implements Callback<String> {
     @Override
-    public void complete(CallBackResult<String> result) {
+    public void complete(RetryResult<String> result) {
         switch (result.getStatus()) {
             case NO_RETRY: // 没有重试直接返回的
                 System.out.println("未触发重试,执行返回值:" + result.getValue());

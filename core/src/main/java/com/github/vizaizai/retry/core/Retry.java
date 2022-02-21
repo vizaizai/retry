@@ -2,10 +2,8 @@ package com.github.vizaizai.retry.core;
 
 import com.github.vizaizai.retry.attempt.AttemptContext;
 import com.github.vizaizai.retry.attempt.strategy.Strategy;
-import com.github.vizaizai.retry.invocation.Callback;
-import com.github.vizaizai.retry.invocation.InvocationOperations;
-import com.github.vizaizai.retry.invocation.Processor;
-import com.github.vizaizai.retry.invocation.VProcessor;
+import com.github.vizaizai.retry.invocation.*;
+import com.github.vizaizai.retry.invocation.spring.BeanHelper;
 import com.github.vizaizai.retry.util.Assert;
 import com.github.vizaizai.retry.util.CollUtils;
 
@@ -34,24 +32,51 @@ public class Retry<T> {
         this.attemptContext = new AttemptContext(3);
     }
     /**
-     * 注入可能需要重试的方法
-     * @param processor 方法
+     * 注入可能需要重试的任务
+     * @param rProcessor 方法
      * @return Retry
      */
-    public static <T> Retry<T> inject(Processor<T> processor) {
-        Assert.notNull(processor,"processor must be not null");
+    public static <T> Retry<T> inject(RProcessor<T> rProcessor) {
+        Assert.notNull(rProcessor,"processor must be not null");
         Retry<T> retry = new Retry<>();
-        retry.retryHandler.setInvocationOps(InvocationOperations.of(processor));
+        retry.retryHandler.setRetryProcessor(RetryProcessor.of(rProcessor));
         return retry;
     }
 
-    public static Retry<Void> inject(VProcessor processor) {
-        Assert.notNull(processor, "processor must be not null");
+    public static Retry<Void> inject(VProcessor vProcessor) {
+        Assert.notNull(vProcessor, "processor must be not null");
         Retry<Void> retry = new Retry<>();
-        retry.retryHandler.setInvocationOps(InvocationOperations.of(processor));
+        retry.retryHandler.setRetryProcessor(RetryProcessor.of(vProcessor));
         return retry;
     }
 
+    /**
+     * 设置重试任务Bean
+     * @param clazz BeanClass
+     * @param args 重试任务执行参数
+     * @return Retry
+     */
+    public static <T> Retry<T> withBean(Class<? extends RetryTask<T>> clazz, Object ...args) {
+        Assert.notNull(clazz, "bean clazz must be not null");
+        Retry<T> retry = new Retry<>();
+        RetryTask<T> retryTask = BeanHelper.getBean(clazz);
+
+        retryTask.preHandle();
+
+        //retry.retryHandler.setRetryProcessor(RetryProcessor.of());
+
+        return retry;
+    }
+
+    /**
+     * 重试任务名称
+     * @param name 名称
+     * @return Retry
+     */
+    public Retry<T> name(String name) {
+        this.retryHandler.getRetryProcessor().setName(name);
+        return this;
+    }
     /**
      * 重试预处理
      * @param preHandler 预处理逻辑
@@ -59,7 +84,7 @@ public class Retry<T> {
      */
     public Retry<T> preHandler(VProcessor preHandler) {
         Assert.notNull(preHandler, "pre-handler must be not null");
-        this.retryHandler.getInvocationOps().setPreRetryProcessor(preHandler);
+        this.retryHandler.getRetryProcessor().setPreRetryProcessor(preHandler);
         return this;
     }
     /**

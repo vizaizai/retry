@@ -1,9 +1,6 @@
 package test;
 
-import com.github.vizaizai.retry.attempt.Modes;
 import com.github.vizaizai.retry.core.Retry;
-import com.github.vizaizai.retry.invocation.Processor;
-import com.github.vizaizai.retry.loop.TimeLooper;
 import com.github.vizaizai.retry.util.Utils;
 
 /**

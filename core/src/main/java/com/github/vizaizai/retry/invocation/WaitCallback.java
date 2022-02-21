@@ -7,6 +7,7 @@ import java.io.Serializable;
  * @author liaochongwei
  * @date 2020/12/8 15:34
  */
+@Deprecated
 @FunctionalInterface
 public interface WaitCallback extends Serializable {
 

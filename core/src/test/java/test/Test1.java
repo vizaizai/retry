@@ -35,7 +35,7 @@ public class Test1 {
                     .max(3)
                     .async(e-> {
                         atomicInteger.incrementAndGet();
-                        System.out.println("callback--------------------:"  + e);
+                        System.out.println("callback--------------------:"  + e.getStatus());
                         TimeLooper.sleep(10);
                     })
                     .retryFor(RetryException.class)

@@ -6,16 +6,20 @@ import com.github.vizaizai.retry.util.Assert;
 import org.slf4j.Logger;
 
 /**
- * 方法调用处理
+ * 方法执行器
  * @author liaochongwei
  * @date 2020/12/8 14:49
  */
-public class InvocationOperations<T> {
-    private static final Logger log = LoggerFactory.getLogger(InvocationOperations.class);
+public class RetryProcessor<T> {
+    private static final Logger log = LoggerFactory.getLogger(RetryProcessor.class);
+    /**
+     * 名称
+     */
+    private String name;
     /**
      * 带有返回值的处理
      */
-    private Processor<T> processor;
+    private RProcessor<T> rProcessor;
     /**
      * 无返回值处理
      */
@@ -33,21 +37,32 @@ public class InvocationOperations<T> {
      */
     private VProcessor preRetryProcessor;
 
-    public static <T> InvocationOperations<T> of(Processor<T> processor) {
+
+    public static <T> RetryProcessor<T> of(RProcessor<T> rProcessor) {
+        Assert.notNull(rProcessor, "The processor must be not null");
+        RetryProcessor<T> retryProcessor = new RetryProcessor<>();
+        retryProcessor.rProcessor = rProcessor;
+        retryProcessor.isReturn = true;
+        return retryProcessor;
+    }
+
+    public static RetryProcessor<Void> of(VProcessor processor) {
         Assert.notNull(processor, "The processor must be not null");
-        InvocationOperations<T> operations = new InvocationOperations<>();
-        operations.processor = processor;
-        operations.isReturn = true;
+        RetryProcessor<Void> retryProcessor = new RetryProcessor<>();
+        retryProcessor.vProcessor = processor;
+        retryProcessor.isReturn = false;
+        return retryProcessor;
+    }
+
+    public static <T> RetryProcessor<T> of(RetryTask<T> retryTask) {
+        Assert.notNull(retryTask, "The retryTask must be not null");
+        RetryProcessor<T> operations = new RetryProcessor<>();
+
+
+
         return operations;
     }
 
-    public static InvocationOperations<Void> of(VProcessor processor) {
-        Assert.notNull(processor, "The processor must be not null");
-        InvocationOperations<Void> operations = new InvocationOperations<>();
-        operations.vProcessor = processor;
-        operations.isReturn = false;
-        return operations;
-    }
 
     public T executeForRetry(){
         this.preHandle();
@@ -58,7 +73,7 @@ public class InvocationOperations<T> {
         try {
 
             if (this.isReturn) {
-                result =  this.processor.execute();
+                result =  this.rProcessor.execute();
             }else {
                 this.vProcessor.execute();
             }
@@ -108,8 +123,20 @@ public class InvocationOperations<T> {
         return cause;
     }
 
-    public Processor<T> getProcessor() {
-        return processor;
+    /**
+     * 获取重试业务处理器
+     * @return Processor
+     */
+    public Object getRealProcessor() {
+        if (isReturn) {
+            return rProcessor;
+        }
+        return vProcessor;
+    }
+
+
+    public RProcessor<T> getRProcessor() {
+        return rProcessor;
     }
 
     public VProcessor getVProcessor() {
@@ -117,5 +144,13 @@ public class InvocationOperations<T> {
     }
     public void setPreRetryProcessor(VProcessor preRetryProcessor) {
         this.preRetryProcessor = preRetryProcessor;
+    }
+
+    public String getName() {
+        return name == null ? "" : name + "-";
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

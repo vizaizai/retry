@@ -2,7 +2,7 @@ package com.github.vizaizai.retry.store;
 
 import com.github.vizaizai.retry.attempt.strategy.Strategy;
 import com.github.vizaizai.retry.invocation.Callback;
-import com.github.vizaizai.retry.invocation.Processor;
+import com.github.vizaizai.retry.invocation.RProcessor;
 import com.github.vizaizai.retry.invocation.VProcessor;
 
 import java.io.Serializable;
@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class AsyncRebootParameter implements Serializable {
 
-    private Processor<?> processor;
+    private RProcessor<?> rProcessor;
 
     private VProcessor vProcessor;
 
@@ -29,12 +29,12 @@ public class AsyncRebootParameter implements Serializable {
 
     private String classKey;
 
-    public Processor<?> getProcessor() {
-        return processor;
+    public RProcessor<?> getProcessor() {
+        return rProcessor;
     }
 
-    public void setProcessor(Processor<?> processor) {
-        this.processor = processor;
+    public void setRProcessor(RProcessor<?> rProcessor) {
+        this.rProcessor = rProcessor;
     }
 
     public VProcessor getVProcessor() {

@@ -3,11 +3,11 @@ package com.github.vizaizai.retry.core;
 import java.io.Serializable;
 
 /**
- * 异步回调结果
+ * 异步重试结果
  * @author liaochongwei
  * @date 2020/12/10 17:52
  */
-public class CallBackResult<T> implements Serializable {
+public class RetryResult<T> implements Serializable {
     /**
      * 重试状态
      */
@@ -20,19 +20,33 @@ public class CallBackResult<T> implements Serializable {
      * 异常
      */
     private Throwable cause;
+    /**
+     * 重试处理器
+     */
+    private Object retryProcessor;
 
 
-    public static <T> CallBackResult<T> ok(RetryStatus status, T value) {
-        CallBackResult<T> result = new CallBackResult<>();
+    public static <T> RetryResult<T> ok(Object retryProcessor, RetryStatus status, T value) {
+        RetryResult<T> result = new RetryResult<>();
+        result.retryProcessor = retryProcessor;
         result.status = status;
         result.value = value;
         return result;
     }
-    public static <T> CallBackResult<T> fail(RetryStatus status, Throwable cause) {
-        CallBackResult<T> result = new CallBackResult<>();
+    public static <T> RetryResult<T> fail(Object retryProcessor, RetryStatus status, Throwable cause) {
+        RetryResult<T> result = new RetryResult<>();
+        result.retryProcessor = retryProcessor;
         result.status = status;
         result.cause = cause;
         return result;
+    }
+
+    public Object getRetryProcessor() {
+        return retryProcessor;
+    }
+
+    public void setRetryProcessor(Object retryProcessor) {
+        this.retryProcessor = retryProcessor;
     }
 
     public RetryStatus getStatus() {
