@@ -24,7 +24,7 @@ public class Test0 {
                 throw new RuntimeException("业务出错");
             }
         });
-        retry1.preHandler(()->{
+        retry1.preHandler((context)->{
             System.out.println("执行了预处理");
             if (true) {
                 throw new RuntimeException("12313123");

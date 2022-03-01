@@ -1,6 +1,6 @@
-package com.github.vizaizai.retry.attempt.strategy;
+package com.github.vizaizai.retry.mode.strategy;
 
-import com.github.vizaizai.retry.attempt.CronSequenceGenerator;
+import com.github.vizaizai.retry.mode.CronSequenceGenerator;
 import com.github.vizaizai.retry.exception.RetryException;
 import com.github.vizaizai.retry.util.Assert;
 

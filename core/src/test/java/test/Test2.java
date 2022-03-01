@@ -1,13 +1,10 @@
 package test;
 
-import com.github.vizaizai.retry.attempt.Modes;
+import com.github.vizaizai.retry.mode.Modes;
 import com.github.vizaizai.retry.core.Retry;
 import com.github.vizaizai.retry.exception.RetryException;
 import test.impl.MyCallback;
 import test.impl.MyProcessor;
-import test.impl.MyVProcessor;
-
-import java.time.temporal.ChronoUnit;
 
 /**
  * @author liaochongwei
@@ -20,7 +17,7 @@ public class Test2 {
      */
     public static void main(String[] args) {
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 100; i++) {
             Retry.inject(new MyProcessor())
                     .mode(Modes.cron("13,37,58 * * * * ?")) // 不支持年份
                     //.mode(Modes.basic(1))

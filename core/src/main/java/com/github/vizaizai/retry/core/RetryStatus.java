@@ -6,7 +6,7 @@ package com.github.vizaizai.retry.core;
  * @date 2020/12/8 16:51
  */
 public enum RetryStatus {
-    // 不重试
+    // 没有重试
     NO_RETRY,
     // 重试中
     RETRYING,

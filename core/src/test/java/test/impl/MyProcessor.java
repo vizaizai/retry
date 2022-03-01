@@ -1,7 +1,7 @@
 package test.impl;
 
 import com.github.vizaizai.retry.exception.RetryException;
-import com.github.vizaizai.retry.invocation.RProcessor;
+import com.github.vizaizai.retry.handler.RProcessor;
 import com.github.vizaizai.retry.loop.TimeLooper;
 
 /**

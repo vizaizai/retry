@@ -1,9 +1,9 @@
-package com.github.vizaizai.retry.attempt;
+package com.github.vizaizai.retry.mode;
 
-import com.github.vizaizai.retry.attempt.strategy.ArithmeticStrategy;
-import com.github.vizaizai.retry.attempt.strategy.BasicStrategy;
-import com.github.vizaizai.retry.attempt.strategy.CronStrategy;
-import com.github.vizaizai.retry.attempt.strategy.GeometricStrategy;
+import com.github.vizaizai.retry.mode.strategy.ArithmeticStrategy;
+import com.github.vizaizai.retry.mode.strategy.BasicStrategy;
+import com.github.vizaizai.retry.mode.strategy.CronStrategy;
+import com.github.vizaizai.retry.mode.strategy.GeometricStrategy;
 
 import java.time.temporal.ChronoUnit;
 

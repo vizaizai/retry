@@ -1,13 +1,13 @@
 package test.impl;
 
 import com.github.vizaizai.retry.core.RetryResult;
-import com.github.vizaizai.retry.invocation.Callback;
+import com.github.vizaizai.retry.handler.PostRetryHandler;
 
 /**
  * @author liaochongwei
  * @date 2021/1/7 14:59
  */
-public class MyCallback implements Callback<String> {
+public class MyCallback implements PostRetryHandler<String> {
     @Override
     public void complete(RetryResult<String> result) {
         switch (result.getStatus()) {

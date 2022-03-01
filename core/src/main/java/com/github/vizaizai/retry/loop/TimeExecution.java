@@ -1,6 +1,6 @@
 package com.github.vizaizai.retry.loop;
 
-import com.github.vizaizai.retry.invocation.WaitCallback;
+import com.github.vizaizai.retry.handler.WaitCallback;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

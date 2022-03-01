@@ -1,6 +1,6 @@
 package test;
 
-import com.github.vizaizai.retry.attempt.Modes;
+import com.github.vizaizai.retry.mode.Modes;
 import com.github.vizaizai.retry.core.Retry;
 import com.github.vizaizai.retry.exception.RetryException;
 import com.github.vizaizai.retry.loop.TimeLooper;
@@ -24,7 +24,7 @@ public class Test1 {
             Retry.inject(() -> {
                 double random = Math.random();
                 TimeLooper.sleep(1);
-                if (random > 0.1) {
+                if (random > 0.5) {
                     throw new RetryException("发生错误啦");
                 }
                 //return "hello" + random;
@@ -34,6 +34,7 @@ public class Test1 {
                     //.mode(Modes.geometric(1D, 2D, ChronoUnit.SECONDS))
                     .max(3)
                     .async(e-> {
+                        System.out.println("次数：" + e.getRetryContext().getAttempts());
                         atomicInteger.incrementAndGet();
                         System.out.println("callback--------------------:"  + e.getStatus());
                         TimeLooper.sleep(10);

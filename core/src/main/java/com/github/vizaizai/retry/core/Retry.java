@@ -1,9 +1,7 @@
 package com.github.vizaizai.retry.core;
 
-import com.github.vizaizai.retry.attempt.AttemptContext;
-import com.github.vizaizai.retry.attempt.strategy.Strategy;
-import com.github.vizaizai.retry.invocation.*;
-import com.github.vizaizai.retry.invocation.spring.BeanHelper;
+import com.github.vizaizai.retry.mode.strategy.Strategy;
+import com.github.vizaizai.retry.handler.*;
 import com.github.vizaizai.retry.util.Assert;
 import com.github.vizaizai.retry.util.CollUtils;
 
@@ -24,47 +22,45 @@ public class Retry<T> {
     /**
      * 尝试环境
      */
-    private final AttemptContext attemptContext;
+    private final RetryContext retryContext;
 
 
     private Retry() {
         retryHandler = new RetryHandler<>();
-        this.attemptContext = new AttemptContext(3);
+        this.retryContext = new RetryContext(3);
     }
     /**
      * 注入可能需要重试的任务
      * @param rProcessor 方法
      * @return Retry
      */
-    public static <T> Retry<T> inject(RProcessor<T> rProcessor) {
+    public static <T> Retry<T> inject(RProcessor<T> rProcessor, Object ...args) {
         Assert.notNull(rProcessor,"processor must be not null");
         Retry<T> retry = new Retry<>();
-        retry.retryHandler.setRetryProcessor(RetryProcessor.of(rProcessor));
+        retry.retryContext.setArgs(args);
+        retry.retryHandler.setRetryProcessor(RetryProcessor.of(rProcessor,retry.retryContext));
         return retry;
     }
 
-    public static Retry<Void> inject(VProcessor vProcessor) {
+    public static Retry<Void> inject(VProcessor vProcessor, Object ...args) {
         Assert.notNull(vProcessor, "processor must be not null");
         Retry<Void> retry = new Retry<>();
-        retry.retryHandler.setRetryProcessor(RetryProcessor.of(vProcessor));
+        retry.retryContext.setArgs(args);
+        retry.retryHandler.setRetryProcessor(RetryProcessor.of(vProcessor, retry.retryContext));
+
         return retry;
     }
-
     /**
-     * 设置重试任务Bean
-     * @param clazz BeanClass
+     * 注入重试任务
+     * @param retryTask 重试任务
      * @param args 重试任务执行参数
      * @return Retry
      */
-    public static <T> Retry<T> withBean(Class<? extends RetryTask<T>> clazz, Object ...args) {
-        Assert.notNull(clazz, "bean clazz must be not null");
+    public static <T> Retry<T> injectTask(AbstractRetryTask<T> retryTask, Object ...args) {
         Retry<T> retry = new Retry<>();
-        RetryTask<T> retryTask = BeanHelper.getBean(clazz);
-
-        retryTask.preHandle();
-
-        //retry.retryHandler.setRetryProcessor(RetryProcessor.of());
-
+        retry.retryContext.setArgs(args);
+        retry.retryHandler.setRetryProcessor(RetryProcessor.of(retryTask, retry.retryContext));
+        retry.retryHandler.setAsync(retryTask.async());
         return retry;
     }
 
@@ -82,9 +78,9 @@ public class Retry<T> {
      * @param preHandler 预处理逻辑
      * @return Retry
      */
-    public Retry<T> preHandler(VProcessor preHandler) {
+    public Retry<T> preHandler(PreRetryHandler preHandler) {
         Assert.notNull(preHandler, "pre-handler must be not null");
-        this.retryHandler.getRetryProcessor().setPreRetryProcessor(preHandler);
+        this.retryHandler.getRetryProcessor().setPreHandler(preHandler);
         return this;
     }
     /**
@@ -94,7 +90,7 @@ public class Retry<T> {
      */
     public Retry<T> max(Integer maxAttempts) {
         Assert.notNull(maxAttempts,"mode must be not null");
-        this.attemptContext.setMaxAttempts(maxAttempts);
+        this.retryContext.setMaxAttempts(maxAttempts);
         return this;
     }
     /**
@@ -104,7 +100,7 @@ public class Retry<T> {
      */
     public Retry<T> mode(Strategy mode) {
         Assert.notNull(mode,"mode must be not null");
-        this.attemptContext.setIntervalStrategy(mode);
+        this.retryContext.setIntervalStrategy(mode);
         return this;
     }
     /**
@@ -117,27 +113,27 @@ public class Retry<T> {
         this.retryHandler.setRetryFor(retryFor);
         return this;
     }
+
     public Retry<T> retryFor(Class<? extends Throwable> retryFor) {
         Assert.notNull(retryFor,"retryFor must be not null");
         this.retryHandler.setRetryFor(Collections.singletonList(retryFor));
         return this;
     }
-
     /**
      * 设置异步
-     * @param callback 回调函数
+     * @param posHandler 重试后置回调
      * @return Retry
      */
-    public Retry<T> async(Callback<T> callback) {
-        Assert.notNull(callback,"callback must be not null");
-        this.retryHandler.setCallback(callback);
+    public Retry<T> async(PostRetryHandler<T> posHandler) {
+        Assert.notNull(posHandler,"posHandler must be not null");
+        this.retryHandler.getRetryProcessor().setPostHandler(posHandler);
         this.retryHandler.setAsync(true);
         return this;
     }
 
     public T execute(){
         this.init();
-        this.retryHandler.tryInvocation();
+        this.retryHandler.tryExecute();
         return this.retryHandler.getResult();
     }
 
@@ -147,7 +143,7 @@ public class Retry<T> {
             // 默认发生RuntimeException和Error就触发重试
             this.retryHandler.setRetryFor(Arrays.asList(RuntimeException.class, Error.class));
         }
-        this.retryHandler.setAttemptContext(this.attemptContext);
+        this.retryHandler.setRetryContext(this.retryContext);
     }
 
 

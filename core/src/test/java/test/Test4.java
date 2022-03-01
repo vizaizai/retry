@@ -1,6 +1,8 @@
 package test;
 
-import com.github.vizaizai.retry.attempt.Modes;
+import com.github.vizaizai.retry.handler.VProcessor;
+import com.github.vizaizai.retry.handler.task.VBaseRetryTask;
+import com.github.vizaizai.retry.mode.Modes;
 import com.github.vizaizai.retry.core.Retry;
 import com.github.vizaizai.retry.util.Utils;
 import test.impl.Test4VProcessor;
@@ -32,7 +34,8 @@ public class Test4 {
                             .max(10)
                             .mode(Modes.basic(1))
                             .async(e->{
-                                Test4VProcessor retryProcessor = (Test4VProcessor) e.getRetryProcessor();
+                                VBaseRetryTask baseRetryTask = (VBaseRetryTask) e.getRetryTask();
+                                Test4VProcessor retryProcessor = (Test4VProcessor) baseRetryTask.getProcessor();
                                 atomicLong.addAndGet(System.currentTimeMillis() - retryProcessor.getStartTime());
                                 latch.countDown();
                             })

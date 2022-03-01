@@ -11,7 +11,7 @@ public class RetryResult<T> implements Serializable {
     /**
      * 重试状态
      */
-    private RetryStatus status;
+    private RetryContext retryContext;
     /**
      * 返回结果
      */
@@ -23,53 +23,43 @@ public class RetryResult<T> implements Serializable {
     /**
      * 重试处理器
      */
-    private Object retryProcessor;
+    private Object retryTask;
 
 
-    public static <T> RetryResult<T> ok(Object retryProcessor, RetryStatus status, T value) {
+    public static <T> RetryResult<T> ok(Object retryTask, RetryContext retryContext, T value) {
         RetryResult<T> result = new RetryResult<>();
-        result.retryProcessor = retryProcessor;
-        result.status = status;
+        result.retryTask = retryTask;
+        result.retryContext = retryContext;
         result.value = value;
         return result;
     }
-    public static <T> RetryResult<T> fail(Object retryProcessor, RetryStatus status, Throwable cause) {
+    public static <T> RetryResult<T> fail(Object retryTask, RetryContext retryContext, Throwable cause) {
         RetryResult<T> result = new RetryResult<>();
-        result.retryProcessor = retryProcessor;
-        result.status = status;
+        result.retryTask = retryTask;
+        result.retryContext = retryContext;
         result.cause = cause;
         return result;
     }
 
-    public Object getRetryProcessor() {
-        return retryProcessor;
+    public RetryContext getRetryContext() {
+        return retryContext;
     }
 
-    public void setRetryProcessor(Object retryProcessor) {
-        this.retryProcessor = retryProcessor;
+    public Object getRetryTask() {
+        return retryTask;
     }
 
     public RetryStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(RetryStatus status) {
-        this.status = status;
+        return retryContext.getStatus();
     }
 
     public T getValue() {
         return value;
     }
 
-    public void setValue(T value) {
-        this.value = value;
-    }
-
     public Throwable getCause() {
         return cause;
     }
 
-    public void setCause(Throwable cause) {
-        this.cause = cause;
-    }
+
 }

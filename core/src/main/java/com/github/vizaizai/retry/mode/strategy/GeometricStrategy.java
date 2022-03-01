@@ -1,4 +1,4 @@
-package com.github.vizaizai.retry.attempt.strategy;
+package com.github.vizaizai.retry.mode.strategy;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

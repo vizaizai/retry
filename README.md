@@ -78,18 +78,6 @@ retry1.(RetryException.class)
       .execute();
 ```
 
-###### 宕机重启异步重试:
-​		对于异步重试模式，当重试未结束，还未执行回调时，服务宕机了，这时可启用宕机重启异步重试。
-
-> **宕机重启异步重试的条件是：`Processor` `VProcessor` 和`Callback`的实现类不能是Lambda表达式或匿名类,因为反序列化时找不到类**
-
-``` java
-// 设置对象序列化文件路径，默认值为/data/retry
-Reboot.DEFAULT_ASYNC_STORE.setStorePath("/data/retry");
-// 服务重启时执行
-Reboot.getInstance().start();
-```
-
 
 
 

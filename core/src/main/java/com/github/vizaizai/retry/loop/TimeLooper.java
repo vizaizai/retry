@@ -1,7 +1,7 @@
 package com.github.vizaizai.retry.loop;
 
 import com.github.vizaizai.logging.LoggerFactory;
-import com.github.vizaizai.retry.invocation.WaitCallback;
+import com.github.vizaizai.retry.handler.WaitCallback;
 import com.github.vizaizai.retry.timewheel.HashedWheelTimer;
 import com.github.vizaizai.retry.timewheel.TimerTask;
 import org.slf4j.Logger;
@@ -20,10 +20,9 @@ public class TimeLooper {
     /**
      * 时间轮，1ms走一格
      */
-    private static  final HashedWheelTimer hashedWheelTimer = new HashedWheelTimer(1,4096, Runtime.getRuntime().availableProcessors());
+    private static final HashedWheelTimer hashedWheelTimer = new HashedWheelTimer(100,4096, Runtime.getRuntime().availableProcessors());
     private TimeLooper() {
     }
-
 
     public static void wait(LocalDateTime exeTime) {
         // 延时时间，毫秒

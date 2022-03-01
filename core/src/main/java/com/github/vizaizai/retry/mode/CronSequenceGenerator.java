@@ -1,4 +1,4 @@
-package com.github.vizaizai.retry.attempt;
+package com.github.vizaizai.retry.mode;
 
 import com.github.vizaizai.retry.util.Utils;
 import org.apache.commons.lang3.StringUtils;

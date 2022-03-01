@@ -1,12 +1,8 @@
 package com.github.vizaizai.retry.core;
 
 import com.github.vizaizai.logging.LoggerFactory;
-import com.github.vizaizai.retry.attempt.AttemptContext;
-import com.github.vizaizai.retry.invocation.Callback;
-import com.github.vizaizai.retry.invocation.RetryProcessor;
+import com.github.vizaizai.retry.handler.RetryProcessor;
 import com.github.vizaizai.retry.loop.TimeLooper;
-import com.github.vizaizai.retry.store.AsyncRebootParameter;
-import com.github.vizaizai.retry.store.StoreService;
 import com.github.vizaizai.retry.util.Utils;
 import org.slf4j.Logger;
 
@@ -34,40 +30,26 @@ public class RetryHandler<T> {
      */
     private List<RetryRuleAttribute> retryRuleAttributes;
     /**
-     * 异步回调
-     */
-    private Callback<T> callback;
-    /**
      * 是否异步
      */
     private boolean async = false;
     /**
-     * 尝试上下文
+     * 重试上下文
      */
-    private AttemptContext attemptContext;
-    /**
-     * 状态
-     */
-    private RetryStatus status;
+    private RetryContext retryContext;
     /**
      * 执行结果
      */
     private T result;
     /**
-     * 存储服务
-     */
-    private StoreService storeService;
-    /**
      * 执行目标方法
      */
-    public void tryInvocation() {
+    public void tryExecute() {
         this.result = this.retryProcessor.execute();
-        Object realProcessor = this.retryProcessor.getRealProcessor();
-        //this.saveParameter();
+        Object retryTask = this.retryProcessor.getRetryTask();
         // 调用正常
         if (!this.retryProcessor.haveErr()) {
-            this.status = RetryStatus.NO_RETRY;
-            this.doCallback(RetryResult.ok(realProcessor, status, this.result));
+            this.doPostHandle(RetryResult.ok(retryTask, this.retryContext, this.result));
             return;
         }
         // 发生了异常,并且满足重试条件
@@ -79,7 +61,6 @@ public class RetryHandler<T> {
                 this.syncRetry();
             }
         }else {
-            status = RetryStatus.NO_RETRY;
             this.retryProcessor.throwErr();
         }
     }
@@ -89,24 +70,24 @@ public class RetryHandler<T> {
      * 异步重试
      */
     private void asyncRetry() {
-        Object realProcessor = this.retryProcessor.getRealProcessor();
+        Object retryTask = this.retryProcessor.getRetryTask();
         // 调用上限
-        if (attemptContext.isMaximum()) {
-            log.error("Retry[{}{}] fail",this.retryProcessor.getName(), attemptContext.getAttempts());
-            this.status = RetryStatus.TRY_FAIL;
+        if (retryContext.isMaximum()) {
+            log.error("Retry[{}{}] fail",this.retryProcessor.getName(), retryContext.getAttempts());
+            this.retryContext.setStatus(RetryStatus.TRY_FAIL);
             // 执行异步回调
-            this.doCallback(RetryResult.fail(realProcessor,this.status, this.retryProcessor.getCause()));
+            this.doPostHandle(RetryResult.fail(retryTask, this.retryContext, this.retryProcessor.getCause()));
             return;
         }
-        status = RetryStatus.RETRYING;
-        LocalDateTime nextTime = attemptContext.getNextTime();
-        log.info("Retry[{}{}] will be execute at {}", this.retryProcessor.getName(),attemptContext.getAttempts(), Utils.format(nextTime, Utils.FORMAT_LONG));
+        this.retryContext.setStatus(RetryStatus.RETRYING);
+        LocalDateTime nextTime = retryContext.getNextRetryTime();
+        log.info("Retry[{}{}] will be execute at {}", this.retryProcessor.getName(),retryContext.getAttempts(), Utils.format(nextTime, Utils.FORMAT_LONG));
         TimeLooper.asyncWaitV2(nextTime, ()-> {
-            this.result = this.retryProcessor.executeForRetry();
+            this.result = this.retryProcessor.execute();
              //重试成功
             if (!this.retryProcessor.haveErr()) {
-                this.status = RetryStatus.TRY_OK;
-                this.doCallback(RetryResult.ok(realProcessor,this.status, this.result));
+                this.retryContext.setStatus(RetryStatus.TRY_OK);
+                this.doPostHandle(RetryResult.ok(retryTask, retryContext, this.result));
                 return;
             }
             this.asyncRetry();
@@ -118,19 +99,19 @@ public class RetryHandler<T> {
     private void syncRetry() {
         while (true) {
             // 调用上限
-            if (attemptContext.isMaximum()) {
-                log.error("Retry[{}{}] fail",this.retryProcessor.getName(), attemptContext.getAttempts());
-                this.status = RetryStatus.TRY_FAIL;
+            if (retryContext.isMaximum()) {
+                log.error("Retry[{}{}] fail",this.retryProcessor.getName(), retryContext.getAttempts());
+                this.retryContext.setStatus(RetryStatus.TRY_FAIL);
                 this.retryProcessor.throwErr();
             }
-            status = RetryStatus.RETRYING;
-            LocalDateTime nextTime = attemptContext.getNextTime();
-            log.info("Retry[{}{}] will be execute at {}",this.retryProcessor.getName(),attemptContext.getAttempts(), Utils.format(nextTime, Utils.FORMAT_LONG));
+            this.retryContext.setStatus(RetryStatus.RETRYING);
+            LocalDateTime nextTime = retryContext.getNextRetryTime();
+            log.info("Retry[{}{}] will be execute at {}",this.retryProcessor.getName(),retryContext.getAttempts(), Utils.format(nextTime, Utils.FORMAT_LONG));
             TimeLooper.wait(nextTime);
-            this.result = this.retryProcessor.executeForRetry();
+            this.result = this.retryProcessor.execute();
             // 重试成功
             if (!this.retryProcessor.haveErr()) {
-                this.status = RetryStatus.TRY_OK;
+                this.retryContext.setStatus(RetryStatus.TRY_OK);
                 return;
             }
         }
@@ -138,7 +119,7 @@ public class RetryHandler<T> {
 
 
     private boolean retryOn(Throwable ex) {
-        if (log.isDebugEnabled() &&  this.getAttemptContext().getAttempts() == 0) {
+        if (log.isDebugEnabled() &&  retryContext.getAttempts() == 0) {
             log.debug("Applying rules to determine whether should retry on {}", ex.getClass());
         }
 
@@ -163,39 +144,12 @@ public class RetryHandler<T> {
         }
         return winner != null;
     }
-
     /**
-     * 执行回调
+     * 执行后置回调处理
      * @param result result
      */
-    private void doCallback(RetryResult<T> result) {
-        if (callback != null) {
-            callback.complete(result);
-        }
-        if (storeService != null) {
-            storeService.delete();
-        }
-    }
-
-
-    /**
-     * 保存重试参数
-     */
-    private void saveParameter() {
-        if (!this.async) {
-            return;
-        }
-        AsyncRebootParameter asyncRebootParameter = new AsyncRebootParameter();
-        asyncRebootParameter.setRProcessor(this.retryProcessor.getRProcessor());
-        asyncRebootParameter.setVProcessor(this.retryProcessor.getVProcessor());
-        asyncRebootParameter.setCallback(this.callback);
-
-        asyncRebootParameter.setMaxAttempts(this.attemptContext.getMaxAttempts());
-        asyncRebootParameter.setMode(this.attemptContext.getIntervalStrategyContext().getStrategy());
-        asyncRebootParameter.setRetryFor(this.retryFor);
-
-        storeService = new StoreService(asyncRebootParameter);
-        storeService.save();
+    private void doPostHandle(RetryResult<T> result) {
+        retryProcessor.postHandle(result);
     }
 
     public void setRetryFor(List<Class<? extends Throwable>> retryFor) {
@@ -205,8 +159,6 @@ public class RetryHandler<T> {
             retryRuleAttributes.add(new RetryRuleAttribute(rbRule));
         }
     }
-
-
 
     public RetryProcessor<T> getRetryProcessor() {
         return retryProcessor;
@@ -221,15 +173,6 @@ public class RetryHandler<T> {
     }
 
 
-
-    public Callback<T> getCallback() {
-        return callback;
-    }
-
-    public void setCallback(Callback<T> callback) {
-        this.callback = callback;
-    }
-
     public boolean isAsync() {
         return async;
     }
@@ -238,21 +181,14 @@ public class RetryHandler<T> {
         this.async = async;
     }
 
-    public AttemptContext getAttemptContext() {
-        return attemptContext;
+    public RetryContext getRetryContext() {
+        return retryContext;
     }
 
-    public void setAttemptContext(AttemptContext attemptContext) {
-        this.attemptContext = attemptContext;
+    public void setRetryContext(RetryContext retryContext) {
+        this.retryContext = retryContext;
     }
 
-    public RetryStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(RetryStatus status) {
-        this.status = status;
-    }
 
     public T getResult() {
         return result;

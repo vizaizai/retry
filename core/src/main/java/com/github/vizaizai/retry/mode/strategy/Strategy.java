@@ -1,4 +1,4 @@
-package com.github.vizaizai.retry.attempt.strategy;
+package com.github.vizaizai.retry.mode.strategy;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;

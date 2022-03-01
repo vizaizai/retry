@@ -3,6 +3,7 @@ package com.github.vizaizai.retry.core;
 import java.io.Serializable;
 
 /**
+ * 重试规则属性
  * @author liaochongwei
  * @date 2020/12/10 10:00
  */

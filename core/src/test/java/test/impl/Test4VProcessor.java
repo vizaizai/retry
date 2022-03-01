@@ -1,6 +1,6 @@
 package test.impl;
 
-import com.github.vizaizai.retry.invocation.VProcessor;
+import com.github.vizaizai.retry.handler.VProcessor;
 
 /**
  * @author liaochongwei
