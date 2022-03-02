@@ -32,7 +32,7 @@ public abstract class AbstractRetryTask<T> implements Serializable {
 
     /**
      * 是否异步执行（默认是）
-     * @return
+     * @return boolean
      */
     public boolean async() {
         return true;
