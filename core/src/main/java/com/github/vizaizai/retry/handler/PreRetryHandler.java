@@ -12,5 +12,5 @@ import java.io.Serializable;
 @FunctionalInterface
 public interface PreRetryHandler extends Serializable {
 
-    void execute(RetryContext retryContext) throws Throwable;
+    boolean execute(RetryContext retryContext) throws Throwable;
 }

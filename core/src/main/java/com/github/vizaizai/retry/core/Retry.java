@@ -89,10 +89,26 @@ public class Retry<T> {
      * @return Retry
      */
     public Retry<T> max(Integer maxAttempts) {
-        Assert.notNull(maxAttempts,"mode must be not null");
+        Assert.notNull(maxAttempts,"maxAttempts must be not null");
         this.retryContext.setMaxAttempts(maxAttempts);
         return this;
     }
+
+    /**
+     *
+     * @param maxAttempts 最大重试次数
+     * @param offset 已执行次数(默认为零)
+     * @return Retry
+     */
+    public Retry<T> max(Integer maxAttempts, Integer offset) {
+        Assert.notNull(maxAttempts,"maxAttempts must be not null");
+        this.retryContext.setMaxAttempts(maxAttempts);
+        if (offset != null && offset >=0 ) {
+            this.retryContext.setAttempts(offset);
+        }
+        return this;
+    }
+
     /**
      * 设置重试间隔模式
      * @param mode mode
@@ -145,6 +161,7 @@ public class Retry<T> {
         }
         this.retryHandler.setRetryContext(this.retryContext);
     }
+
 
 
 }

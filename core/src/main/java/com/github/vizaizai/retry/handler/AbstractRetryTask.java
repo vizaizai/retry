@@ -14,7 +14,8 @@ public abstract class AbstractRetryTask<T> implements Serializable {
     /**
      * 重试预处理
      */
-    public void preHandle(RetryContext retryContext) throws Throwable{
+    public boolean preHandle(RetryContext retryContext) throws Throwable{
+        return true;
     }
 
     /**

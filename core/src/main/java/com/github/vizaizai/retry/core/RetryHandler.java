@@ -1,6 +1,7 @@
 package com.github.vizaizai.retry.core;
 
 import com.github.vizaizai.logging.LoggerFactory;
+import com.github.vizaizai.retry.exception.PreRetryHandleException;
 import com.github.vizaizai.retry.handler.RetryProcessor;
 import com.github.vizaizai.retry.loop.TimeLooper;
 import com.github.vizaizai.retry.util.Utils;
@@ -9,6 +10,8 @@ import org.slf4j.Logger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**`
  * 重试上下文
@@ -42,29 +45,45 @@ public class RetryHandler<T> {
      */
     private T result;
     /**
+     * 异步重试中处理器
+     */
+    private static final Map<String,RetryHandler<?>> asyncRetryingHandlers = new ConcurrentHashMap<>();
+    /**
      * 执行目标方法
      */
     public void tryExecute() {
-        this.result = this.retryProcessor.execute();
-        Object retryTask = this.retryProcessor.getRetryTask();
-        // 调用正常
-        if (!this.retryProcessor.haveErr()) {
-            this.doPostHandle(RetryResult.ok(retryTask, this.retryContext, this.result));
-            return;
-        }
-        // 发生了异常,并且满足重试条件
-        if (this.retryOn(this.retryProcessor.getCause())) {
-            // 异步重试
-            if (this.async) {
-                this.asyncRetry();
+        // 未执行过，先执行一次
+        if (retryContext.getAttempts() == 0) {
+            // 执行一次正常调用
+            this.result = this.retryProcessor.execute();
+            // 调用正常
+            if (!this.retryProcessor.haveErr()) {
+                if (this.async) {
+                    this.doPostHandle(RetryResult.ok(this.retryProcessor.getRetryTask(), this.retryContext, this.result));
+                }
+                return;
+            }
+            // 发生了异常,并且满足重试条件
+            if (this.retryOn(this.retryProcessor.getCause())) {
+                this.doRetry();
             }else {
-                this.syncRetry();
+                this.retryProcessor.throwErr();
             }
         }else {
-            this.retryProcessor.throwErr();
+            this.doRetry();
         }
+
     }
 
+    private void doRetry() {
+        // 异步重试
+        if (this.async) {
+            this.asyncRetry();
+        }else {
+            this.syncRetry();
+        }
+
+    }
 
     /**
      * 异步重试
@@ -79,18 +98,25 @@ public class RetryHandler<T> {
             this.doPostHandle(RetryResult.fail(retryTask, this.retryContext, this.retryProcessor.getCause()));
             return;
         }
+        this.addRetryingHandler();
         this.retryContext.setStatus(RetryStatus.RETRYING);
         LocalDateTime nextTime = retryContext.getNextRetryTime();
         log.info("Retry[{}{}] will be execute at {}", this.retryProcessor.getName(),retryContext.getAttempts(), Utils.format(nextTime, Utils.FORMAT_LONG));
         TimeLooper.asyncWaitV2(nextTime, ()-> {
             this.result = this.retryProcessor.execute();
+            this.removeRetryingHandler();
              //重试成功
             if (!this.retryProcessor.haveErr()) {
                 this.retryContext.setStatus(RetryStatus.TRY_OK);
                 this.doPostHandle(RetryResult.ok(retryTask, retryContext, this.result));
-                return;
+            }else if (this.retryOn(this.retryProcessor.getCause())) {// 满足重试条件
+                this.asyncRetry();
+            }else {
+                this.retryContext.setStatus(RetryStatus.TRY_ABORT);
+                // 重试失败，且不满足重试条件，则直接异步返回
+                this.doPostHandle(RetryResult.fail(retryTask, retryContext, this.retryProcessor.getCause()));
             }
-            this.asyncRetry();
+
         });
     }
     /**
@@ -114,11 +140,18 @@ public class RetryHandler<T> {
                 this.retryContext.setStatus(RetryStatus.TRY_OK);
                 return;
             }
+            if (!this.retryOn(this.retryProcessor.getCause())) {// 不满足重试条件，直接抛出异常
+                this.retryProcessor.throwErr();
+            }
         }
     }
 
 
     private boolean retryOn(Throwable ex) {
+        // 排除预处理异常，直接返回false
+        if (ex instanceof PreRetryHandleException) {
+            return false;
+        }
         if (log.isDebugEnabled() &&  retryContext.getAttempts() == 0) {
             log.debug("Applying rules to determine whether should retry on {}", ex.getClass());
         }
@@ -158,6 +191,22 @@ public class RetryHandler<T> {
         for (Class<?> rbRule : retryFor) {
             retryRuleAttributes.add(new RetryRuleAttribute(rbRule));
         }
+    }
+
+    private void addRetryingHandler() {
+        if (this.retryProcessor.getName() != null) {
+            asyncRetryingHandlers.put(this.retryProcessor.getName(), this);
+        }
+    }
+
+    private void removeRetryingHandler() {
+        if (this.retryProcessor.getName() != null) {
+            asyncRetryingHandlers.remove(this.retryProcessor.getName());
+        }
+    }
+
+    public static Map<String,RetryHandler<?>>  getAsyncRetryingHandlers() {
+        return asyncRetryingHandlers;
     }
 
     public RetryProcessor<T> getRetryProcessor() {

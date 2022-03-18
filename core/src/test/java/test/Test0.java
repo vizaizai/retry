@@ -1,6 +1,7 @@
 package test;
 
 import com.github.vizaizai.retry.core.Retry;
+import com.github.vizaizai.retry.mode.Modes;
 import com.github.vizaizai.retry.util.Utils;
 
 /**
@@ -24,11 +25,17 @@ public class Test0 {
                 throw new RuntimeException("业务出错");
             }
         });
+        retry1.mode(Modes.basic(2));
+        retry1.max(20,1);
+//        retry1.async((e)->{
+//            System.out.println("回调了:"+e.getStatus());
+//        });
         retry1.preHandler((context)->{
             System.out.println("执行了预处理");
-            if (true) {
-                throw new RuntimeException("12313123");
-            }
+//            if (true) {
+//                throw new RuntimeException("12313123");
+//            }
+            return false;
         });
         retry1.execute();
 

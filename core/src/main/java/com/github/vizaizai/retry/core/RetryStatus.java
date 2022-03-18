@@ -10,6 +10,8 @@ public enum RetryStatus {
     NO_RETRY,
     // 重试中
     RETRYING,
+    // 重试中止
+    TRY_ABORT,
     // 全部失败
     TRY_FAIL,
     // 成功

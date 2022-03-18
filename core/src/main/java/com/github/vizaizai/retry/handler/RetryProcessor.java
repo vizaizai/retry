@@ -3,11 +3,13 @@ package com.github.vizaizai.retry.handler;
 import com.github.vizaizai.logging.LoggerFactory;
 import com.github.vizaizai.retry.core.RetryContext;
 import com.github.vizaizai.retry.core.RetryResult;
+import com.github.vizaizai.retry.exception.PreRetryHandleException;
 import com.github.vizaizai.retry.exception.RetryException;
 import com.github.vizaizai.retry.handler.task.AbstractProcessorRetryTask;
 import com.github.vizaizai.retry.handler.task.RBaseRetryTask;
 import com.github.vizaizai.retry.handler.task.VBaseRetryTask;
 import com.github.vizaizai.retry.util.Assert;
+import com.github.vizaizai.retry.util.Utils;
 import org.slf4j.Logger;
 
 import java.lang.reflect.ParameterizedType;
@@ -99,6 +101,7 @@ public class RetryProcessor<T> {
         try {
             // 预处理
             this.preHandle();
+            // 执行业务
             result = retryTask.execute(this.retryContext);
             this.cause = null;
         }catch (RuntimeException | Error ex) {
@@ -124,12 +127,21 @@ public class RetryProcessor<T> {
 
     private void preHandle() {
         // 重试预处理
+        boolean handlePass = true;
         try {
-            this.retryTask.preHandle(this.retryContext);
+            // 预处理未通过
+            if (!this.retryTask.preHandle(this.retryContext)) {
+                handlePass = false;
+            }
         }catch (Throwable throwable) {
             log.error("Retry pre-handle error: {}", throwable.getMessage());
+            throw new PreRetryHandleException(throwable);
+        }
+        if (!handlePass) {
+            throw new PreRetryHandleException("Retry pre-handle fail");
         }
     }
+
     public boolean haveErr() {
         return cause != null;
     }
@@ -172,6 +184,9 @@ public class RetryProcessor<T> {
 
     public String getName() {
         return name == null ? "" : name + "-";
+    }
+    public String getNameAsNull() {
+        return name;
     }
 
     public void setName(String name) {

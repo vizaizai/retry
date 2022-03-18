@@ -22,10 +22,11 @@ public abstract class AbstractProcessorRetryTask<T> extends AbstractRetryTask<T>
     protected PostRetryHandler<T> postHandler;
 
     @Override
-    public void preHandle(RetryContext retryContext) throws Throwable {
+    public boolean preHandle(RetryContext retryContext) throws Throwable {
         if (this.preHandler != null) {
-            this.preHandler.execute(retryContext);
+            return this.preHandler.execute(retryContext);
         }
+        return true;
     }
 
     @Override
