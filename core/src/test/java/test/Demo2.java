@@ -21,7 +21,7 @@ public class Demo2 {
 
     public static void main(String[] args) throws InterruptedException {
 
-        HashedWheelTimer hashedWheelTimer = new HashedWheelTimer(200,2048, Runtime.getRuntime().availableProcessors());
+        HashedWheelTimer hashedWheelTimer = new HashedWheelTimer(200,2048, Runtime.getRuntime().availableProcessors(),200,2000);
 
         hashedWheelTimer.newTimeout(()->{
             System.out.println("12123");

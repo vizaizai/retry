@@ -56,16 +56,14 @@ public class HashedWheelTimer implements Timer{
      */
     private final ExecutorService taskPool;
     /**
-     * 阻塞队列容量
-     */
-    private static final Integer BLOCKING_QUEUE_CAPACITY = 500;
-    /**
      * 新建时间轮定时器
      * @param tickDuration tick时间间隔（ms）
      * @param ticksPerWheel 时间轮上tick数量
-     * @param taskPoolSize 处理任务的线程数
+     * @param corePoolSize 处理任务的核心线程数
+     * @param maxPoolSize 处理任务的最大线程数
+     * @param blockingQueueCapacity 阻塞队列容量（-1表示不限制）
      */
-    public HashedWheelTimer(long tickDuration, int ticksPerWheel, int taskPoolSize) {
+    public HashedWheelTimer(long tickDuration, int ticksPerWheel, int corePoolSize, int maxPoolSize, int blockingQueueCapacity) {
         this.tickDuration = tickDuration;
         // 初始化轮盘，大小格式化为2的N次，可以使用 & 代替取余
         int ticksNum = formatSize(ticksPerWheel);
@@ -78,10 +76,16 @@ public class HashedWheelTimer implements Timer{
         mask = wheel.length - 1;
 
         log.info("Initializing[time-task-pool]...");
+        BlockingQueue<Runnable> blockingQueue;
+        if (blockingQueueCapacity == -1) {
+            blockingQueue = new LinkedBlockingQueue<>();
+        }else {
+            blockingQueue = new ArrayBlockingQueue<>(blockingQueueCapacity);
+        }
         ThreadFactory taskThreadFactory = new BasicThreadFactory.Builder().namingPattern("Time-Task-%d").build();
-        taskPool =  new ThreadPoolExecutor(taskPoolSize, taskPoolSize * 4,
+        taskPool =  new ThreadPoolExecutor(corePoolSize, maxPoolSize,
                 100L, TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<>(BLOCKING_QUEUE_CAPACITY),
+                blockingQueue,
                 taskThreadFactory, new ThreadPoolExecutor.CallerRunsPolicy());
 
         // 初始化启动时间

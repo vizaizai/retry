@@ -23,7 +23,7 @@ public class Demo1 {
 
         ExecutorService executorService = Executors.newFixedThreadPool(500);
         System.out.println("初始化模拟生产者线程池完成--");
-        HashedWheelTimer hashedWheelTimer = new HashedWheelTimer(1,4096, Runtime.getRuntime().availableProcessors());
+        HashedWheelTimer hashedWheelTimer = new HashedWheelTimer(100,4096, Runtime.getRuntime().availableProcessors(),200,-1);
 
 
         AtomicLong n = new AtomicLong(0);

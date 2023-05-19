@@ -18,9 +18,9 @@ import java.util.concurrent.TimeUnit;
 public class TimeLooper {
     private static final Logger log = LoggerFactory.getLogger(TimeLooper.class);
     /**
-     * 时间轮，1ms走一格
+     * 时间轮，100ms走一格
      */
-    private static final HashedWheelTimer hashedWheelTimer = new HashedWheelTimer(100,4096, Runtime.getRuntime().availableProcessors());
+    private static final HashedWheelTimer hashedWheelTimer = new HashedWheelTimer(100,4096, Runtime.getRuntime().availableProcessors(), 200, -1);
     private TimeLooper() {
     }
 

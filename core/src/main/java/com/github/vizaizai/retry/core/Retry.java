@@ -34,20 +34,17 @@ public class Retry<T> {
      * @param rProcessor 方法
      * @return Retry
      */
-    public static <T> Retry<T> inject(RProcessor<T> rProcessor, Object ...args) {
+    public static <T> Retry<T> inject(RProcessor<T> rProcessor) {
         Assert.notNull(rProcessor,"processor must be not null");
         Retry<T> retry = new Retry<>();
-        retry.retryContext.setArgs(args);
         retry.retryHandler.setRetryProcessor(RetryProcessor.of(rProcessor,retry.retryContext));
         return retry;
     }
 
-    public static Retry<Void> inject(VProcessor vProcessor, Object ...args) {
+    public static Retry<Void> inject(VProcessor vProcessor) {
         Assert.notNull(vProcessor, "processor must be not null");
         Retry<Void> retry = new Retry<>();
-        retry.retryContext.setArgs(args);
         retry.retryHandler.setRetryProcessor(RetryProcessor.of(vProcessor, retry.retryContext));
-
         return retry;
     }
     /**
