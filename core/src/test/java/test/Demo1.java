@@ -1,9 +1,9 @@
 package test;
 
-import com.github.vizaizai.logging.LoggerFactory;
 import com.github.vizaizai.retry.timewheel.HashedWheelTimer;
 import com.github.vizaizai.retry.util.Utils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -42,7 +42,7 @@ public class Demo1 {
                         n.addAndGet(c);
                         //TimeLooper.sleep(1);
                         if (c > 100) {
-                            System.err.println("误差：" + c);
+                            log.info("误差：{}",c);
                         }
                     },delay, TimeUnit.SECONDS);
                 }

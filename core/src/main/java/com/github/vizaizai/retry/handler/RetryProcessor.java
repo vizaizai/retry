@@ -1,6 +1,5 @@
 package com.github.vizaizai.retry.handler;
 
-import com.github.vizaizai.logging.LoggerFactory;
 import com.github.vizaizai.retry.core.RetryContext;
 import com.github.vizaizai.retry.core.RetryResult;
 import com.github.vizaizai.retry.exception.PreRetryHandleException;
@@ -9,11 +8,8 @@ import com.github.vizaizai.retry.handler.task.AbstractProcessorRetryTask;
 import com.github.vizaizai.retry.handler.task.RBaseRetryTask;
 import com.github.vizaizai.retry.handler.task.VBaseRetryTask;
 import com.github.vizaizai.retry.util.Assert;
-import com.github.vizaizai.retry.util.Utils;
 import org.slf4j.Logger;
-
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import org.slf4j.LoggerFactory;
 
 /**
  * 方法执行器

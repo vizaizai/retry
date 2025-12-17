@@ -22,16 +22,14 @@ public class Test1 {
         for (int i = 0; i < 10; i++) {
 
             Retry.inject(() -> {
-                double random = Math.random();
-                TimeLooper.sleep(1);
-                if (random > 0.5) {
-                    throw new RetryException("发生错误啦");
-                }
-                //return "hello" + random;
-            })
+                        double random = Math.random();
+                        TimeLooper.sleep(1);
+                        if (random > 0.5) {
+                            throw new RetryException("发生错误啦");
+                        }
+                        //return "hello" + random;
+                    })
                     .mode(Modes.basic(1))
-                    //.mode(Modes.arithmetic(1, 1, ChronoUnit.SECONDS))
-                    //.mode(Modes.geometric(1D, 2D, ChronoUnit.SECONDS))
                     .max(3)
                     .async(e-> {
                         System.out.println("次数：" + e.getRetryContext().getAttempts());

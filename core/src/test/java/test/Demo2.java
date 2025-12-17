@@ -1,6 +1,6 @@
 package test;
 
-import com.github.vizaizai.logging.LoggerFactory;
+import org.slf4j.LoggerFactory;
 import com.github.vizaizai.retry.timewheel.HashedWheelTimer;
 import com.github.vizaizai.retry.util.Utils;
 import org.slf4j.Logger;

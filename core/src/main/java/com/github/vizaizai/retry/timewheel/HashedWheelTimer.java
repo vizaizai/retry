@@ -1,6 +1,6 @@
 package com.github.vizaizai.retry.timewheel;
 
-import com.github.vizaizai.logging.LoggerFactory;
+import org.slf4j.LoggerFactory;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.slf4j.Logger;
 

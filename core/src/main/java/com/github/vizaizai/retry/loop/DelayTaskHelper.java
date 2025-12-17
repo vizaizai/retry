@@ -3,7 +3,7 @@ package com.github.vizaizai.retry.loop;
 import com.github.vizaizai.retry.util.Utils;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.slf4j.Logger;
-import com.github.vizaizai.logging.LoggerFactory;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;

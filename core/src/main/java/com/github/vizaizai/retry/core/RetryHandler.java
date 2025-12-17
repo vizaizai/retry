@@ -1,6 +1,6 @@
 package com.github.vizaizai.retry.core;
 
-import com.github.vizaizai.logging.LoggerFactory;
+import org.slf4j.LoggerFactory;
 import com.github.vizaizai.retry.exception.PreRetryHandleException;
 import com.github.vizaizai.retry.handler.RetryProcessor;
 import com.github.vizaizai.retry.loop.TimeLooper;
